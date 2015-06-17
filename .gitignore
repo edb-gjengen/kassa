@@ -1,0 +1,8 @@
+*.swp
+*.pyc
+.idea
+local_settings.py
+db.sqlite3
+venv
+node_modules
+bower_components
