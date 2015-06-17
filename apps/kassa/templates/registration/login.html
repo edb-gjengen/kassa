@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block body_classes %}page-login{% endblock %}
+
+{% block title %}Logg inn{% endblock %}
+
+{% block content %}
+<div class="content row">
+    <div class="small-4 small-centered columns">
+        <div class="logo">
+            <div class="image-logo"></div>
+        </div>
+        <h3>Logg inn</h3>
+        {% include "registration/login_form.html" %}
+    </div>
+</div>
+{% endblock %}

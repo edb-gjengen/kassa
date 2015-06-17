@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Logget ut{% endblock %}
+
+{% block content %}
+<div class="content row">
+    <div class="large-4 large-centered columns logo">
+        <h2>Du har blitt logget ut.</h2>
+        <p>Vil du <a href="{% url "login" %}">logge inn</a> igjen?</p>
+    </div>
+</div>
+{% endblock %}

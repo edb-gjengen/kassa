@@ -19,5 +19,6 @@ from apps.kassa import urls as kassa_urls
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include(kassa_urls)),
+    url('^', include(kassa_urls)),
+    url('^accounts/', include('django.contrib.auth.urls'))
 ]

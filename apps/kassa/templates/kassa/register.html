@@ -1,2 +1,12 @@
 {% extends "base.html" %}
-{% block content %}LOL{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="small-6 columns">
+        <h2>Registrer kjøpt medlemskap</h2>
+        Telefonnummer som allerede er tilknyttet en bruker i Inside vil få kortnummer registrert på sin bruker.
+        {{ form }}
+        <label for="tlf">Kortnummer</label><input id="card-num" type="number" class="small-6">
+        <button type="submit">Registrer</button>
+    </div>
+</div>
+{% endblock %}
