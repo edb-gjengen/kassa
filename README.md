@@ -1,7 +1,6 @@
 ## TODO
 ### Form
 * tlf field
-    * type="tel"
     * validates in javascript with phonenumber-package
     * onkeyup could shows matching user data from inside (name, expires)
 * cardnumber field

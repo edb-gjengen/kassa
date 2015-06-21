@@ -1,12 +1,26 @@
 {% extends "base.html" %}
+{% load i18n bootstrap %}
 {% block content %}
 <div class="row">
-    <div class="small-6 columns">
+    <div class="col-xs-12">
         <h2>Registrer kjøpt medlemskap</h2>
-        Telefonnummer som allerede er tilknyttet en bruker i Inside vil få kortnummer registrert på sin bruker.
-        {{ form }}
-        <label for="tlf">Kortnummer</label><input id="card-num" type="number" class="small-6">
-        <button type="submit">Registrer</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6">
+        <p>Telefonnummer som allerede er tilknyttet en bruker i Inside vil få kortnummer registrert på sin bruker.</p>
+        <form>
+            {{ form|bootstrap }}
+            <button type="submit" class="btn btn-primary btn-lg">{% trans "Register" %}</button>
+        </form>
+    </div>
+    <div class="col-sm-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">Søkeresultater</div>
+            <div class="panel-body results">
+                TODO: ...
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

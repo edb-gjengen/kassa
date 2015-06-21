@@ -3,11 +3,28 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Registrer medlemskap{% endblock %}</title>
+    <link rel="shortcut icon" href="{% static "dist/images/favicon.ico" %}">
+    <link rel="stylesheet" href="{% static "dist/styles/vendor.css" %}">
     <link rel="stylesheet" href="{% static "dist/styles/app.css" %}">
+    <script src="{% static "dist/scripts/vendor.js" %}"></script>
     <script src="{% static "dist/scripts/app.js" %}"></script>
 </head>
 <body>
+{% block header %}
+    {% include "header.html" %}
+{% endblock %}
+<div class="container">
 {% block content %}{% endblock %}
+</div>
+<footer class="footer">
+    <div class="container">
+        <div class="credits"><p><a href="https://studentersamfundet.no" title="Det Norske Studentersamfund"><img src="{% static "dist/images/logo.png" %}" width="70" height="70"></a></p>
+        Laget med <span class="love" title="kærlighed">♥</span> av <a href="http://kak.studentersamfundet.no/" title="Kommunikasjonsavdelingen">KAK</a></div>
+
+    </div>
+</footer>
 </body>
 </html>

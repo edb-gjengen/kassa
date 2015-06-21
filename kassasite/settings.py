@@ -35,6 +35,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'bootstrapform',
+    'django_extensions'
+
 )
 
 LOCAL_APPS = ('apps.kassa',)
@@ -108,6 +112,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+LOGIN_REDIRECT_URL = '/'
 
 # Local settings
 try:

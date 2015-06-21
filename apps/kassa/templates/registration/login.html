@@ -1,16 +1,15 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block body_classes %}page-login{% endblock %}
 
 {% block title %}Logg inn{% endblock %}
 
 {% block content %}
-<div class="content row">
-    <div class="small-4 small-centered columns">
-        <div class="logo">
-            <div class="image-logo"></div>
-        </div>
-        <h3>Logg inn</h3>
+<div class="row">
+    <div class="col-sm-4 center-block">
+        <p><strong>Kassa</strong> helps you register purchased membership cards. It's a tool for volunteers and bar employees at <a href="https://studentersamfundet">The Norwegian Student Society</a>.</p>
+        <h3>{% trans "Log in" %}</h3>
         {% include "registration/login_form.html" %}
     </div>
 </div>

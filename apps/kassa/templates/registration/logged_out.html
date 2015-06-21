@@ -1,12 +1,13 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block title %}Logget ut{% endblock %}
 
 {% block content %}
-<div class="content row">
-    <div class="large-4 large-centered columns logo">
-        <h2>Du har blitt logget ut.</h2>
-        <p>Vil du <a href="{% url "login" %}">logge inn</a> igjen?</p>
+<div class="row">
+    <div class="logo">
+        <h3>{% trans "You have been logged out" %}</h3>
+        <p>{% trans "Do you want do " %}<a href="{% url "login" %}">{% trans "log in" %}</a> {% trans "again?" %}</p>
     </div>
 </div>
 {% endblock %}

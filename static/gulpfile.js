@@ -119,7 +119,7 @@ gulp.task('watch', ['serve'], function () {
 
     // watch for changes
     gulp.watch([
-        '../templates/**/*.html',
+        '../apps/kassa/templates/**/*.html',
         'dist/scripts/**/*.js',
         'dist/images/**/*'
     ]).on('change', reload);

@@ -1,25 +1,11 @@
-{% load i18n %}
+{% load i18n bootstrap %}
 <div class="login-form">
     <form method="post" action="{% url "login" %}">
-        {% if form.non_field_errors %}
-            {{ form.non_field_errors }}<br />
-        {% endif %}
         {% csrf_token %}
-        <input type="hidden" name="next" value="{{ next }}" />
-            <div>
-                <label>{% trans "Email" %}</label>
-                {{ form.username }} {{ form.username.errors }}
-            </div>
-            <div>
-                <label>{% trans "Password" %}</label>
-                {{ form.password }} {{ form.password.errors }}
-            </div>
-            <div>
-            <button type="submit" class="large-12 large-centered columns btn-action">{% trans "Log in" %}</button>
-            </div>
-            <div class="text-right">
-                <a href="{% url "password_reset" %}">{% trans "Forgot username or password?" %}</a>
-            </div>
-
+        {{ form|bootstrap }}
+        <button type="submit" class="btn btn-primary btn-block btn-lg">{% trans "Log in" %}</button>
     </form>
+    <div class="login-form--forgot-password">
+        <a href="{% url "password_reset" %}">{% trans "Forgot username or password?" %}</a>
+    </div>
 </div>

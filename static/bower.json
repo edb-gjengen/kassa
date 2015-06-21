@@ -1,12 +1,12 @@
 {
-  "name": "sis-slides",
+  "name": "kassa",
   "private": true,
   "dependencies": {
-    "jquery": "latest",
-    "foundation": "latest",
-    "underscore": "~1.8.3",
-    "list.js": "~1.1.1",
-    "components-font-awesome": "~4.3.0"
+    "jquery": "2.1.4",
+    "underscore": "1.8.3",
+    "list.js": "1.1.1",
+    "components-font-awesome": "4.3.0",
+    "bootstrap-sass": "3.3.5"
   },
   "devDependencies": {},
   "resolutions": {

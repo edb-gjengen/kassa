@@ -1,30 +1,29 @@
-@import "settings"; // Global settings
-
-@import "../../bower_components/foundation/scss/normalize";
-@import
-  "../../bower_components/foundation/scss/foundation/components/block-grid",
-  "../../bower_components/foundation/scss/foundation/components/buttons",
-  "../../bower_components/foundation/scss/foundation/components/dropdown",
-  "../../bower_components/foundation/scss/foundation/components/dropdown-buttons",
-  "../../bower_components/foundation/scss/foundation/components/forms",
-  "../../bower_components/foundation/scss/foundation/components/grid",
-  "../../bower_components/foundation/scss/foundation/components/inline-lists",
-  "../../bower_components/foundation/scss/foundation/components/labels",
-  "../../bower_components/foundation/scss/foundation/components/progress-bars",
-  "../../bower_components/foundation/scss/foundation/components/reveal",
-  "../../bower_components/foundation/scss/foundation/components/sub-nav",
-  "../../bower_components/foundation/scss/foundation/components/tables",
-  "../../bower_components/foundation/scss/foundation/components/tooltips",
-  "../../bower_components/foundation/scss/foundation/components/top-bar",
-  "../../bower_components/foundation/scss/foundation/components/type",
-  "../../bower_components/foundation/scss/foundation/components/visibility";
-
 /* Vendor styles */
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 @import "../../bower_components/components-font-awesome/scss/font-awesome";
 
 /* Global styles */
 body {
-  background-color: $body-bg;
+}
+/* Helpers */
+.center-block {
+  float: none;
+}
+/* Forms */
+.login-form--forgot-password {
+  text-align: right;
+  margin-top: 10px;
 }
 
+/* Footer */
+.credits {
+  margin-top: 25px;
+  margin-bottom: 25px;
+  text-align: center;
+  color: #666;
+  font-size: 12px;
+}
+.love {
+    color: #faafba;
+}
 @import "header";
