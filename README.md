@@ -14,6 +14,11 @@
     # Login with test@example.com:test
 
 ## TODO
+* Existing members adds membercard to user
+* Add labels for active/member status
+* Add label for existing card
+* support tablet (1280x800) resolution
+
 ### Form
 * tlf field
     * validates in javascript with phonenumber-package
@@ -37,3 +42,4 @@
 * store in inside-table din_phonenumber, din_usedmembercard, din_user
 * lookup inside user table
 * lookup sms-tables in inside
+
