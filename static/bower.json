@@ -5,7 +5,6 @@
     "jquery": "2.1.4",
     "underscore": "1.8.3",
     "list.js": "1.1.1",
-    "components-font-awesome": "4.3.0",
     "bootstrap-sass": "3.3.5"
   },
   "devDependencies": {},
@@ -13,15 +12,11 @@
     "jquery": "2.1.4"
   },
   "overrides": {
-    "components-font-awesome": {
+    "bootstrap-sass": {
       "main": [
-        "css/font-awesome.css",
-        "scss/font-awesome.scss",
-        "fonts/fontawesome-webfont.eot",
-        "fonts/fontawesome-webfont.woff",
-        "fonts/fontawesome-webfont.woff2",
-        "fonts/fontawesome-webfont.ttf",
-        "fonts/fontawesome-webfont.svg"
+        "assets/stylesheets/_bootstrap.scss",
+        "assets/fonts/bootstrap/*",
+        "assets/javascripts/bootstrap.js"
       ]
     }
   }

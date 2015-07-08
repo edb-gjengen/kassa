@@ -1,3 +1,5 @@
+$icon-font-path: '../fonts/';
+
 /* Vendor styles */
 @import "../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 @import "../../bower_components/components-font-awesome/scss/font-awesome";
@@ -5,15 +7,46 @@
 /* Global styles */
 body {
 }
+
 /* Helpers */
 .center-block {
   float: none;
 }
+
 /* Forms */
 .login-form--forgot-password {
   text-align: right;
   margin-top: 10px;
 }
+.query-form {
+  margin-bottom: 20px;
+}
+.search-result {
+  font-weight: normal;
+
+  .label {
+    float: right;
+    font-size: 1em;
+  }
+  [type=radio] {
+    zoom: 1.5;
+
+    position: relative;
+    top: 2px;
+    margin-right: 4px;
+
+    &:focus {
+      outline: none;
+    }
+  }
+  &.selected {
+    background-color: #eee;
+  }
+  &.member {
+    padding-left: 44px;
+  }
+}
+
 
 /* Footer */
 .credits {
@@ -26,4 +59,6 @@ body {
 .love {
     color: #faafba;
 }
+
+/* Header */
 @import "header";
