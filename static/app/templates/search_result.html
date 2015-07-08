@@ -1,0 +1,21 @@
+{% if not res.cardno or res.legacy_card_number %}
+    <label for="{{ res.id }}" data-phone-number="{{ res.number }}" class="list-group-item search-result can-register-card{% if res.is_member == "1" %} member{% else %} not-member{% endif %}">
+    <input type="radio" name="user" id="{{ res.id }}">
+{% else %}
+    <div class="list-group-item search-result has-card{% if res.is_member %} member{% else %}not-member{% endif %}">
+{% endif %}
+<!-- Name -->
+{{ res.firstname }} {{ res.lastname }}
+<!-- Label -->
+{% if res.is_member == "1" %}
+    <span class="label label-success">Member</span>
+{% elif res.expires == "0000-00-00" %}
+    <span class="label label-default">Registered</span>
+{% else %}
+    <span class="label label-warning">Expired: {{res.expires}}</span>
+{% endif %}
+{% if not res.cardno or res.legacy_card_number %}
+    </label>
+{% else %}
+    </div>
+{% endif %}

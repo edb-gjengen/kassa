@@ -34,13 +34,8 @@ gulp.task('diststyles', function () {
 });
 
 gulp.task('vendorscripts', function () {
-    var extra_js = [
-        __dirname + '/bower_compontents/foundation/js/foundation/foundation.topbar.js',
-        __dirname + '/bower_compontents/foundation/js/foundation/foundation.reveal.js'
-    ];
-    var vendor_scripts = bowerFiles().concat(extra_js);
     //console.log(vendor_scripts);
-    return gulp.src(vendor_scripts)
+    return gulp.src(bowerFiles())
         .pipe($.filter('**/*.js'))
         //.pipe($.uglify())
         .pipe($.concat('vendor.js'))
@@ -99,11 +94,19 @@ gulp.task('extras', function () {
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('clean', function (cb) {
-    del(['.tmp', 'dist'], cb);
+gulp.task('templates', function () {
+    return gulp.src('app/templates/*.html')
+        .pipe($.nunjucks())
+        .pipe($.concat('templates.js'))
+        .pipe(gulp.dest('dist/scripts'))
+        .pipe($.size());
 });
 
-gulp.task('build', ['vendorscripts', 'vendorstyles', 'distscripts', 'diststyles', 'images', 'fonts', 'extras']);
+gulp.task('clean', function (cb) {
+    del(['dist'], cb);
+});
+
+gulp.task('build', ['vendorscripts', 'vendorstyles', 'distscripts', 'diststyles', 'images', 'fonts', 'extras', 'templates']);
 
 gulp.task('default', ['clean'], function () {
     gulp.start('build');
@@ -126,6 +129,7 @@ gulp.task('watch', ['serve'], function () {
 
     gulp.watch('app/styles/**/*.scss', ['styles']);
     gulp.watch('app/scripts/**/*.js', ['scripts']);
+    gulp.watch('app/templates/**/*.html', ['templates']);
     gulp.watch('app/images/**/*', ['images']);
     gulp.watch('bower.json', ['vendorscripts']);
 });

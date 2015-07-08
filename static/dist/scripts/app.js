@@ -1,34 +1,5 @@
 function format_results(results) {
-    var html = '<div class="list-group">';
-    for(var i=0; i< results.length; i++) {
-        var res = results[i];
-
-        var label = '';
-        var is_member = res.is_member && res.is_member === "1";
-        var add_to_button = '';
-        var css_classes = 'list-group-item search-result';
-        var expires = res.expires;
-
-        if(is_member) {
-            label = ' <span class="label label-success">Member</span> ';
-            css_classes += ' member';
-        } else if(expires === '0000-00-00') {
-            add_to_button = '<input type="radio" name="random" id="'+res.id+'"> ';
-            label = ' <span class="label label-default">Registered</span> ';
-            css_classes += ' registered';
-        } else {
-            add_to_button = '<input type="radio" name="random" id="'+res.id+'"> ';
-            label = ' <span class="label label-warning">Expired: '+ expires +'</span> ';
-            css_classes += ' expired';
-        }
-
-        if(is_member) {
-            html += '<div class="'+css_classes+'">' + add_to_button + res.firstname + ' ' + res.lastname + label + '</div>';
-        } else {
-            html += '<label for="'+ res.id +'" data-phone-number="'+ res.number +'" class="'+css_classes+'">' + add_to_button + res.firstname + ' ' + res.lastname + label + '</label>';
-        }
-    }
-    return html + '</div>';
+    return nunjucks.render('search_results.html', {'results':results});
 }
 
 $(document).ready(function(){
