@@ -18,6 +18,7 @@
 * Add labels for active/member status
 * Add label for existing card
 * support tablet (1280x800) resolution
+* Selected user in form: on select, display user details in register form.
 
 ### Form
 * tlf field
