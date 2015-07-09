@@ -3,7 +3,7 @@ var lineno = null;
 var colno = null;
 var output = "";
 try {
-if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"cardno", env.opts.autoescape) || runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"legacy_card_number", env.opts.autoescape)) {
+if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"cardno", env.opts.autoescape) || runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_is_legacy", env.opts.autoescape)) {
 output += "\n    <label for=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"id", env.opts.autoescape), env.opts.autoescape);
 output += "\" data-phone-number=\"";
@@ -41,7 +41,9 @@ output += " ";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"lastname", env.opts.autoescape), env.opts.autoescape);
 output += "\n<!-- Label -->\n";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"is_member", env.opts.autoescape) == "1") {
-output += "\n    <span class=\"label label-success\">Member</span>\n";
+output += "\n    <span class=\"label label-success\">Member: ";
+output += runtime.suppressValue(env.getFilter("default").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"expires", env.opts.autoescape),"Lifelong"), env.opts.autoescape);
+output += "</span>\n";
 ;
 }
 else {
@@ -58,7 +60,7 @@ output += "</span>\n";
 ;
 }
 output += "\n";
-if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"cardno", env.opts.autoescape) || runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"legacy_card_number", env.opts.autoescape)) {
+if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"cardno", env.opts.autoescape) || runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_is_legacy", env.opts.autoescape)) {
 output += "\n    </label>\n";
 ;
 }

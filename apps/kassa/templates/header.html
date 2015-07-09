@@ -15,7 +15,10 @@
         <li class="active"><a href="{% url "register" %}">{% trans "Home" %}</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        {% if user.is_authenticated %}<li><a href="{% url "logout" %}">{% trans "Log out" %}</a></li>{% endif %}
+        {% if user.is_authenticated %}
+            <li><a href="#">Logged in as: <strong>{{ user.get_full_name|default:user.username }}</strong></a></li>
+            <li><a href="{% url "logout" %}">{% trans "Log out" %}</a></li>
+        {% endif %}
       </ul>
     </div><!--/.nav-collapse -->
   </div>

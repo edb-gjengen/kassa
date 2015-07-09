@@ -37,7 +37,6 @@
 * Inside auth and models
 * local users tied to inside user
 * maybe user add page
-* menu with login and logout
 
 ### Backend
 * store in inside-table din_phonenumber, din_usedmembercard, din_user
