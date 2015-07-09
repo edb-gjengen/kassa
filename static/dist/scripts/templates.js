@@ -23,7 +23,7 @@ output += "\">\n";
 ;
 }
 else {
-output += "\n    <div class=\"list-group-item search-result has-card";
+output += "\n    <!-- Has card -->\n    <div class=\"list-group-item search-result has-card";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"is_member", env.opts.autoescape)) {
 output += " member";
 ;
@@ -39,7 +39,18 @@ output += "\n<!-- Name -->\n";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"firstname", env.opts.autoescape), env.opts.autoescape);
 output += " ";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"lastname", env.opts.autoescape), env.opts.autoescape);
-output += "\n<!-- Label -->\n";
+output += "\n<!-- Card label -->\n";
+if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"cardno", env.opts.autoescape) && !runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_is_legacy", env.opts.autoescape)) {
+output += "\n    <span class=\"card label\"><span class=\"glyphicon glyphicon-user\"></span> ";
+output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"cardno", env.opts.autoescape), env.opts.autoescape);
+output += "</span>\n";
+;
+}
+else {
+output += "\n    <span class=\"card label\"><span class=\"glyphicon glyphicon-user\"></span> No card</span>\n";
+;
+}
+output += "\n<!-- Membership label -->\n";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"is_member", env.opts.autoescape) == "1") {
 output += "\n    <span class=\"label label-success\">Member: ";
 output += runtime.suppressValue(env.getFilter("default").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"expires", env.opts.autoescape),"Lifelong"), env.opts.autoescape);

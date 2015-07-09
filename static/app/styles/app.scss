@@ -24,8 +24,11 @@ body {
   font-weight: normal;
 
   .label {
-    float: right;
     font-size: 1em;
+  }
+  .card {
+    border: 1px solid #555;
+    color: #555;
   }
   [type=radio] {
     zoom: 1.5;
