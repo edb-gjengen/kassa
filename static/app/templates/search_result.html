@@ -1,5 +1,5 @@
 {% if not res.cardno or res.card_is_legacy %}
-    <label for="{{ res.id }}" data-phone-number="{{ res.number }}" class="list-group-item search-result can-register-card{% if res.is_member == "1" %} member{% else %} not-member{% endif %}">
+    <label for="{{ res.id }}" data-phone-number="{{ res.number }}" data-user-id="{{ res.id }}" class="list-group-item search-result can-register-card{% if res.is_member == "1" %} member{% else %} not-member{% endif %}">
     <input type="radio" name="user" id="{{ res.id }}">
 {% else %}
     <!-- Has card -->

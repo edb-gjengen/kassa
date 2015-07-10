@@ -91,7 +91,8 @@ $(document).ready(function(){
         phoneNumber: $('#id_phone_number'),
         cardNumber: $('#id_card_number'),
         registerButton: $('#register-submit-btn'),
-        usernameField: $('#id_username')
+        usernameField: $('#id_username'),
+        userId: $('#id_user_id')
     };
     var urls = {
         insideUserApi: '/inside/user/',
@@ -129,8 +130,10 @@ $(document).ready(function(){
         $.getJSON(urls.insidePhoneNumberApi, {q: val}, function(data) {
             if(data.meta && data.meta.num_results == 1) {
                 set_field_state(_dom.phoneNumber, 'success');
+                _dom.userId.val(data.results[0].id);
             } else {
                 set_field_state(_dom.phoneNumber, '');
+                _dom.userId.val('');
             }
         });
     });
@@ -139,7 +142,7 @@ $(document).ready(function(){
         if(!validate_form('cardNumber')) {
             return;
         }
-        /* cardnumber should be in the database */
+        /* Card number should exist in the database and not tied to existing user */
         var val = _dom.cardNumber.val().trim();
         $.getJSON(urls.insideCardNumber, {q: val}, function(data) {
             if(data.error) {
@@ -150,7 +153,7 @@ $(document).ready(function(){
                 set_field_state(_dom.cardNumber, 'error', 'Cannot find card number in database.');
             }
             else if(data.user !== null && data.valid) {
-                set_field_state(_dom.cardNumber, 'warning', 'Card number belongs to existing user');
+                set_field_state(_dom.cardNumber, 'error', 'Card number belongs to existing user: '+ data.user.firstname +''+ data.user.lastname +'('+data.user.id+').');
             }
             else if(data.user === null && data.valid) {
                 set_field_state(_dom.cardNumber, 'success');
@@ -164,8 +167,13 @@ $(document).ready(function(){
     _dom.results.on('click', '.search-result input', function(e){
         var label = $(this).parent();
         var number = label.attr('data-phone-number');
+        var user_id = label.attr('data-user-id');
         $('.search-result').removeClass('selected');
         label.toggleClass('selected');
+        _dom.userId.val(user_id);
+        if(number === '-') {
+            number = '';
+        }
         _dom.phoneNumber.val(number);
     });
 

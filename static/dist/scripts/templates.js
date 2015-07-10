@@ -8,6 +8,8 @@ output += "\n    <label for=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"id", env.opts.autoescape), env.opts.autoescape);
 output += "\" data-phone-number=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"number", env.opts.autoescape), env.opts.autoescape);
+output += "\" data-user-id=\"";
+output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"id", env.opts.autoescape), env.opts.autoescape);
 output += "\" class=\"list-group-item search-result can-register-card";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"is_member", env.opts.autoescape) == "1") {
 output += " member";
