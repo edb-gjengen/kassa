@@ -117,7 +117,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 LOGIN_REDIRECT_URL = '/'
 
 INSIDE_API_KEY = ''
-INSIDE_API_URL = 'https://inside.studentersamfundet.no/api/user.php'
+INSIDE_API_URL = 'https://inside.studentersamfundet.no/api/'
 
 # Local settings
 try:

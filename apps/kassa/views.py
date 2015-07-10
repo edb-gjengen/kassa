@@ -17,13 +17,38 @@ def register(request):
     }
     return render(request, 'kassa/register.html', context)
 
+
 @login_required
 def inside_user_api(request):
     payload = {
         'apikey': settings.INSIDE_API_KEY,
         'q': request.GET.get('q', '')
     }
-    url = settings.INSIDE_API_URL
+    url = '{}user.php'.format(settings.INSIDE_API_URL)
+    data = requests.get(url, params=payload).json()
+
+    return JsonResponse(data)
+
+
+@login_required
+def inside_phone_number_api(request):
+    payload = {
+        'apikey': settings.INSIDE_API_KEY,
+        'q': request.GET.get('q', '')
+    }
+    url = '{}phonenumber.php'.format(settings.INSIDE_API_URL)
+    data = requests.get(url, params=payload).json()
+
+    return JsonResponse(data)
+
+
+@login_required
+def inside_card_number_api(request):
+    payload = {
+        'apikey': settings.INSIDE_API_KEY,
+        'q': request.GET.get('q', '')
+    }
+    url = '{}cardnumber.php'.format(settings.INSIDE_API_URL)
     data = requests.get(url, params=payload).json()
 
     return JsonResponse(data)
