@@ -3,17 +3,43 @@ function format_results(results) {
     return nunjucks.render('search_results.html', {'results':results});
 }
 
-function set_field_state(field_element, state) {
-    var ok_span = '<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>';
+function set_field_state(field_element, state, help_text) {
+    if(!help_text) {
+        help_text = '';
+    }
+    var help_span = '<span class="help-block ">'+ help_text +'</span>';
+    var state_to_icon = {
+        success: 'ok',
+        warning: 'warning-sign',
+        error: 'remove'
+    };
+    var feedback_span = '<span class="glyphicon glyphicon-'+ state_to_icon[state] +' form-control-feedback" aria-hidden="true"></span>';
+    var css_class = 'has-'+state;
     var form_group = field_element.parent();
-    if(state === 'valid') {
-        form_group.addClass('has-success has-feedback');
-        if(!form_group.find('.form-control-feedback').length) {
-            form_group.append(ok_span); // Only add once
+    form_group.removeClass('has-success has-warning has-error has-feedback'); // reset
+    if(['success', 'warning', 'error'].indexOf(state) !== -1) {
+        form_group.addClass(css_class +' has-feedback');
+        /* Feedback icon */
+        var feedback_el = form_group.find('.form-control-feedback');
+        if (!feedback_el.length) {
+             // add
+            form_group.append(feedback_span);
+        } else {
+            // Update
+            feedback_el.removeClass('glyphicon-ok glypicon-warning-sign glyphicon-remove');
+            feedback_el.addClass('glyphicon-'+state_to_icon[state]);
         }
-    } else {
-        form_group.removeClass('has-success has-feedback');
+        /* Help text */
+        var help_text_el = form_group.find('.help-block');
+        if(!help_text_el.length) {
+            form_group.append(help_span);
+        } else {
+            help_text_el.text(help_text);
+        }
+    }
+    else {
         form_group.find('.form-control-feedback').remove();
+        form_group.find('.help-block').remove();
     }
 }
 
@@ -42,9 +68,9 @@ function validate_form() {
     var cardno_val = _dom.cardNumber.val();
     var cardno_invalid = validate_cardnumber(cardno_val);
     if(cardno_invalid) {
+        set_field_state(_dom.cardNumber, 'error', cardno_invalid);
         errors.push(cardno_invalid);
     }
-    console.log(cardno_invalid);
 
     if(errors.length === 0) {
         _dom.registerButton.removeAttr('disabled');
@@ -92,8 +118,8 @@ $(document).ready(function(){
             }
         });
     });
-    /* Phonenumber as you type */
 
+    /* Phone number as you type */
     _dom.phoneNumber.on('keyup', function() {
         var val = _dom.phoneNumber.val().trim();
         if(val.length === 0) {
@@ -102,12 +128,13 @@ $(document).ready(function(){
         }
         $.getJSON(urls.insidePhoneNumberApi, {q: val}, function(data) {
             if(data.meta && data.meta.num_results == 1) {
-                set_field_state(_dom.phoneNumber, 'valid');
+                set_field_state(_dom.phoneNumber, 'success');
             } else {
                 set_field_state(_dom.phoneNumber, '');
             }
         });
     });
+    /* Card number as you type */
     _dom.cardNumber.on('keyup', function() {
         if(!validate_form('cardNumber')) {
             return;
@@ -115,8 +142,18 @@ $(document).ready(function(){
         /* cardnumber should be in the database */
         var val = _dom.cardNumber.val().trim();
         $.getJSON(urls.insideCardNumber, {q: val}, function(data) {
-            if(data.result === 'valid') {
-                set_field_state(_dom.cardNumber, 'valid');
+            if(data.error) {
+                set_field_state(_dom.cardNumber, 'error', data.error);
+                return;
+            }
+            if(!data.valid) {
+                set_field_state(_dom.cardNumber, 'error', 'Cannot find card number in database.');
+            }
+            else if(data.user !== null && data.valid) {
+                set_field_state(_dom.cardNumber, 'warning', 'Card number belongs to existing user');
+            }
+            else if(data.user === null && data.valid) {
+                set_field_state(_dom.cardNumber, 'success');
             } else {
                 set_field_state(_dom.cardNumber, '');
             }
@@ -132,10 +169,10 @@ $(document).ready(function(){
         _dom.phoneNumber.val(number);
     });
 
-    /* Default state disabled */
+    /* Initial state disabled */
     _dom.registerButton.attr('disabled','disabled');
 
-    /* Focus */
+    /* Initial focus */
     if(_dom.usernameField) {
         _dom.usernameField.focus();
     }
