@@ -15,8 +15,6 @@
 
 ## TODO
 * Existing members adds membercard to user
-* Add labels for active/member status
-* Add label for existing card
 * support tablet (1280x800) resolution
 * Selected user in form: on select, display user details in register form.
 
@@ -24,22 +22,17 @@
 * tlf field
     * validates in javascript with phonenumber-package
     * onkeyup could shows matching user data from inside (name, expires)
-* cardnumber field
-    * js validation
-    * js lookup from membercardnumber table
+* verify form consistency
 * submit button
+    * change text to "... and renew" if existing member
     * grey if form invalid
     * blue if form valid
     * grey out on submit
-* verify consistency
 
 ### Other
-* Inside auth and models
-* local users tied to inside user
-* maybe user add page
+* Inside auth
 
 ### Backend
 * store in inside-table din_phonenumber, din_usedmembercard, din_user
-* lookup inside user table
 * lookup sms-tables in inside
 

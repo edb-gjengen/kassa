@@ -7,21 +7,28 @@
 {% endif %}
 <!-- Name -->
 {{ res.firstname }} {{ res.lastname }}
-<!-- Card label -->
-{% if res.cardno and not res.card_is_legacy %}
-    <span class="card label"><span class="glyphicon glyphicon-user"></span> {{ res.cardno }}</span>
-{% else %}
-    <span class="card label"><span class="glyphicon glyphicon-user"></span> No card</span>
-{% endif %}
-<!-- Membership label -->
-{% if res.is_member == "1" %}
-    <span class="label label-success">Member: {{res.expires|default('Lifelong')}}</span>
-{% elif res.expires == "0000-00-00" %}
-    <span class="label label-default">Registered</span>
-{% else %}
-    <span class="label label-warning">Expired: {{ res.expires }}</span>
-{% endif %}
+<div class="labels">
+    <!-- Membership -->
+    {% if res.is_member == "1" %}
+        <span class="label label-success">Member: {{res.expires|default('Lifelong')}}</span>
+    {% elif res.expires == "0000-00-00" %}
+        <span class="label label-default">Registered</span>
+    {% else %}
+        <span class="label label-warning">Expired: {{ res.expires }}</span>
+    {% endif %}
+    <!-- Card -->
+    {% if res.cardno and not res.card_is_legacy %}
+        <span class="label label-card "><span class="glyphicon glyphicon-user"></span> {{ res.cardno }}</span>
+    {% else %}
+        <span class="label label-card "><span class="glyphicon glyphicon-user"></span> No card</span>
+    {% endif %}
+    <!-- Is active -->
+    {% if res.is_active == "1" %}
+        <span class="label label-is-active">Active</span>
+    {% endif %}
+</div>
 {% if not res.cardno or res.card_is_legacy %}
+    <div class="selected-icon"><span class="glyphicon glyphicon-ok"></span></div>
     </label>
 {% else %}
     </div>

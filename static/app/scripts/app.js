@@ -51,7 +51,7 @@ function validate_cardnumber(val) {
         return 'Card number should start with 1.';
 }
     if(val.length !== 9) {
-        return 'Card Number should be 9 digits long';
+        return 'Card number should be 9 digits long';
     }
 
     return '';

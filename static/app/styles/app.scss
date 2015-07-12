@@ -27,9 +27,12 @@ body {
   .label {
     font-size: 1em;
   }
-  .card {
+  .label-card {
     border: 1px solid #555;
     color: #555;
+  }
+  .label-is-active {
+    background-color: darkred;
   }
   [type=radio] {
     margin-right: 4px;
@@ -40,12 +43,22 @@ body {
   }
   &.selected {
     background-color: #eee;
+    .selected-icon {
+      visibility: visible;
+    }
   }
   &.has-card {
     padding-left: 44px;
   }
 }
-
+.selected-icon {
+  visibility: hidden;
+  float: right;
+  bottom: 48px;
+  position: relative;
+  font-size: 1.5em;
+  color: #5cb85c;
+}
 
 /* Footer */
 .credits {
