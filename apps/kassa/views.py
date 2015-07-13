@@ -68,7 +68,7 @@ def inside_card_number_api(request):
         params.update({
             'card_number': request.GET.get('card_number', '')
         })
-        response = requests.get(url, params=params).json()
+        response = requests.get(url, params=params)
 
     return JsonResponse(response.json(), status=response.status_code)
 
