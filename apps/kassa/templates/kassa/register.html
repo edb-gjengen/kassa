@@ -7,18 +7,29 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-sm-6">
-        <form>
+    <div class="col-sm-5">
+        <form class="register-card-form" autocomplete="off">
+            {% csrf_token %}
             <h3>{% trans "Register card" %}</h3>
-            <span class="glyphicon glyphicon-phone"></span>
+            <div class="register-card-form--selected-user-wrap">
+                <!-- Placeholder -->
+                <div class="list-group-item search-result placeholder">
+                    <input type="radio" name="user" checked>
+                    <em>New user</em>
+                    <div class="labels">
+                        <span class="label label-card "><span class="glyphicon glyphicon-user"></span> New card</span>
+                    </div>
+                </div>
+            </div>
             {{ add_card_form|bootstrap }}
             <p><em>Registering a card number with a phone number already tied to an existing user, will add the card to that user.</em></p>
             <button id="register-submit-btn" type="submit" class="btn btn-primary btn-lg">{% trans "Register" %}</button>
         </form>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-7">
         <h3>{% trans "Search existing users" %}</h3>
-        <form class="form-inline query-form">
+        <em>{% trans "Firstname, lastname, card number, email" %}</em>
+        <form class="form-inline query-form" autocomplete="off">
             {{ search_user_form|bootstrap_inline }}
         </form>
         <div class="results-wrap"></div>

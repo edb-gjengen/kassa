@@ -1,35 +1,46 @@
-{% if not res.cardno or res.card_is_legacy %}
-    <label for="{{ res.id }}" data-phone-number="{{ res.number }}" data-user-id="{{ res.id }}" class="list-group-item search-result can-register-card{% if res.is_member == "1" %} member{% else %} not-member{% endif %}">
-    <input type="radio" name="user" id="{{ res.id }}">
-{% else %}
-    <!-- Has card -->
-    <div class="list-group-item search-result has-card{% if res.is_member %} member{% else %}not-member{% endif %}">
-{% endif %}
-<!-- Name -->
-{{ res.firstname }} {{ res.lastname }}
-<div class="labels">
-    <!-- Membership -->
-    {% if res.is_member == "1" %}
-        <span class="label label-success">Member: {{res.expires|default('Lifelong')}}</span>
-    {% elif res.expires == "0000-00-00" %}
-        <span class="label label-default">Registered</span>
+{% if not placeholder %}
+    {% if not res.cardno or res.card_is_legacy %}
+        <label for="{{ res.id }}" data-phone-number="{{ res.number }}" data-user-id="{{ res.id }}" class="list-group-item search-result can-register-card{% if res.is_member == "1" %} member{% else %} not-member{% endif %}">
+        <input type="radio" name="user" id="{{ res.id }}"{% if checked %} checked{% endif %}>
     {% else %}
-        <span class="label label-warning">Expired: {{ res.expires }}</span>
+        <!-- Has card -->
+        <div class="list-group-item search-result has-card{% if res.is_member %} member{% else %}not-member{% endif %}">
     {% endif %}
-    <!-- Card -->
-    {% if res.cardno and not res.card_is_legacy %}
-        <span class="label label-card "><span class="glyphicon glyphicon-user"></span> {{ res.cardno }}</span>
+    <!-- Name -->
+    {{ res.firstname }} {{ res.lastname }}
+    <div class="labels">
+        <!-- Membership -->
+        {% if res.is_member == "1" %}
+            <span class="label label-success">Member: {{res.expires|default('Lifelong')}}</span>
+        {% elif res.expires == "0000-00-00" %}
+            <span class="label label-default">Registered</span>
+        {% else %}
+            <span class="label label-warning">Expired: {{ res.expires }}</span>
+        {% endif %}
+        <!-- Card -->
+        {% if not res.card_is_legacy %}
+            <span class="label label-card "><span class="glyphicon glyphicon-user"></span> {{ res.cardno|default('No card') }}</span>
+        {% else %}
+            <span class="label label-card "><span class="glyphicon glyphicon-user"></span> No card</span>
+        {% endif %}
+        <!-- Is active -->
+        {% if res.is_active == "1" %}
+            <span class="label label-is-active">Active</span>
+        {% endif %}
+    </div>
+    {% if not res.cardno or res.card_is_legacy %}
+        <div class="selected-icon"><span class="glyphicon glyphicon-ok"></span></div>
+        </label>
     {% else %}
-        <span class="label label-card "><span class="glyphicon glyphicon-user"></span> No card</span>
+        </div>
     {% endif %}
-    <!-- Is active -->
-    {% if res.is_active == "1" %}
-        <span class="label label-is-active">Active</span>
-    {% endif %}
-</div>
-{% if not res.cardno or res.card_is_legacy %}
-    <div class="selected-icon"><span class="glyphicon glyphicon-ok"></span></div>
-    </label>
 {% else %}
+    <!-- Placeholder -->
+    <div class="list-group-item search-result placeholder">
+        <input type="radio" name="user" checked>
+        <em>New</em>
+        <div class="labels">
+            <span class="label label-card "><span class="glyphicon glyphicon-user"></span> {{ res.cardno|default('New card') }}</span>
+        </div>
     </div>
 {% endif %}
