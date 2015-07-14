@@ -187,10 +187,10 @@ $(document).ready(function(){
                 _dom.results.html(data.error);
             }
             else {
-                if(val === "") {
-                    _dom.results.html('');
-                } else {
+                if(val !== "") {
                     _dom.results.html("Found no existing user with search param: '"+ val +"'");
+                } else {
+                    _dom.results.html('');
                 }
             }
         });
@@ -212,6 +212,8 @@ $(document).ready(function(){
                 set_field_state(_dom.phoneNumberField, '');
                 set_selected_user('', true);
             }
+            cardForm.fields.phoneNumber = true;
+            update_submit_button();
         });
 
     });
@@ -226,21 +228,28 @@ $(document).ready(function(){
         }
         $.getJSON(urls.insideCardNumber, {card_number: val}, function(data) {
             if(data.error) {
+                update_submit_button();
+                cardForm.fields.cardNumber = false;
                 set_field_state(_dom.cardNumberField, 'error', data.error);
                 return;
             }
             if(!data.valid) {
+                cardForm.fields.cardNumber = false;
                 set_field_state(_dom.cardNumberField, 'error', 'Cannot find card number in database.');
             }
             else if(data.user !== null && data.valid) {
-                var user = data.user[0];
-                set_field_state(_dom.cardNumberField, 'error', 'Card number is in use and belongs to existing user: '+ user.firstname +' '+ user.lastname +' ('+user.id+').');
+                var _user = data.user[0];
+                cardForm.fields.cardNumber = false;
+                set_field_state(_dom.cardNumberField, 'error', 'Card number is in use and belongs to existing user: '+ _user.firstname +' '+ _user.lastname +' ('+_user.id+').');
             }
             else if(data.user === null && data.valid) {
+                cardForm.fields.cardNumber = true;
                 set_field_state(_dom.cardNumberField, 'success');
             } else {
+                cardForm.fields.cardNumber = true;
                 set_field_state(_dom.cardNumberField, '');
             }
+            update_submit_button();
         });
     });
 
