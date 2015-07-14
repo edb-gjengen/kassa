@@ -97,7 +97,7 @@ output += "\n";
 ;
 }
 else {
-output += "\n    <!-- Placeholder -->\n    <div class=\"list-group-item search-result placeholder\">\n        <input type=\"radio\" name=\"user\" checked>\n        <em>New</em>\n        <div class=\"labels\">\n            <span class=\"label label-card \"><span class=\"glyphicon glyphicon-user\"></span> ";
+output += "\n    <!-- Placeholder -->\n    <div class=\"list-group-item search-result placeholder\">\n        <input type=\"radio\" name=\"user\" checked>\n        <em>New member</em>\n        <div class=\"labels\">\n            <span class=\"label label-card \"><span class=\"glyphicon glyphicon-user\"></span> ";
 output += runtime.suppressValue(env.getFilter("default").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"cardno", env.opts.autoescape),"New card"), env.opts.autoescape);
 output += "</span>\n        </div>\n    </div>\n";
 ;

@@ -123,17 +123,17 @@ function validateCardForm() {
        - phonenumber should be valid (python-phonenumbers)
        - userid exists (optional)
     */
-    /* Card number */
-    var cardno_invalid = validateCardNumber(formData.card_number);
-    if(cardno_invalid) {
-        set_field_state(_dom.cardNumberField, 'error', cardno_invalid);
-        errors.push(cardno_invalid);
-    }
     /* Phone number */
     var phone_number_invalid = validatePhoneNumber(formData.phone_number);
     if(phone_number_invalid) {
         set_field_state(_dom.phoneNumberField, 'error', phone_number_invalid);
         errors.push(phone_number_invalid);
+    }
+    /* Card number */
+    var cardno_invalid = validateCardNumber(formData.card_number);
+    if(cardno_invalid) {
+        set_field_state(_dom.cardNumberField, 'error', cardno_invalid);
+        errors.push(cardno_invalid);
     }
     console.log("Errors: ", errors);
 
@@ -199,10 +199,11 @@ $(document).ready(function(){
 
     /* Phone number as you type */
     _dom.phoneNumberField.on('input', function() {
-        if( !validateCardForm() ) {
+        var val = _dom.phoneNumberField.val().trim();
+        if( validatePhoneNumber(val) !== '') {
+            set_field_state(_dom.phoneNumberField, 'error', validatePhoneNumber(val));
             return;
         }
-        var val = _dom.phoneNumberField.val().trim();
         $.getJSON(urls.insidePhoneNumberApi, {q: val}, function(data) {
             if(data.meta && data.meta.num_results == 1) {
                 set_field_state(_dom.phoneNumberField, 'success');
@@ -217,10 +218,11 @@ $(document).ready(function(){
     /* Card number as you type */
     _dom.cardNumberField.on('input', function() {
         /* Card number should exist in the database and not tied to existing user */
-        if( !validateCardForm() ) {
+        var val = _dom.cardNumberField.val().trim();
+        if( validateCardNumber(val) !== '' ) {
+            set_field_state(_dom.cardNumberField, 'error', validateCardNumber(val));
             return;
         }
-        var val = _dom.cardNumberField.val().trim();
         $.getJSON(urls.insideCardNumber, {card_number: val}, function(data) {
             if(data.error) {
                 set_field_state(_dom.cardNumberField, 'error', data.error);
@@ -257,7 +259,7 @@ $(document).ready(function(){
         if(number === '-') {
             number = '';
         }
-        _dom.phoneNumberField.val(number);
+        _dom.phoneNumberField.val(number).trigger('input');
     });
 
     _dom.registerButton.on('click', function(e) {
