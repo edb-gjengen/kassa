@@ -20,6 +20,7 @@ function getParameterByName(name) {
         results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
+
 function format_results(results) {
     return nunjucks.render('search_results.html', {'results':results});
 }
@@ -58,7 +59,7 @@ function set_field_state(field_element, state, help_text) {
     };
     var feedback_span = '<span class="glyphicon glyphicon-'+ state_to_icon[state] +' form-control-feedback" aria-hidden="true"></span>';
     var css_class = 'has-'+state;
-    var form_group = field_element.parent();
+    var form_group = field_element.parent().parent();
     form_group.removeClass('has-success has-warning has-error has-feedback'); // reset
     if(['success', 'warning', 'error'].indexOf(state) !== -1) {
         form_group.addClass(css_class +' has-feedback');
@@ -86,25 +87,46 @@ function set_field_state(field_element, state, help_text) {
     }
 }
 
+function cardFormIsValid() {
+    return _.all(_.values(cardForm.fields));
+}
+
+function update_submit_button() {
+    if( cardFormIsValid() ) {
+        _dom.registerButton.prop('disabled', false);
+        return;
+    }
+    _dom.registerButton.prop('disabled', true);
+}
 function validatePhoneNumber(val) {
     if(val.length === 0) {
+        cardForm.fields.phoneNumber = false;
+        update_submit_button();
         return 'Phonenumber number should not be empty.';
     }
-
+    cardForm.fields.phoneNumber = true;
+    update_submit_button();
     return '';
 }
 
 function validateCardNumber(val) {
     if(val.length === 0) {
+        cardForm.fields.cardNumber = false;
+        update_submit_button();
         return 'Card number should not be empty.';
     }
     if(val.length > 0 && val[0] != "1") {
+        cardForm.fields.cardNumber = false;
+        update_submit_button();
         return 'Card number should start with 1.';
 }
     if(val.length !== 9) {
+        cardForm.fields.cardNumber = false;
+        update_submit_button();
         return 'Card number should be 9 digits long';
     }
-
+    cardForm.fields.cardNumber = true;
+    update_submit_button();
     return '';
 }
 
@@ -116,40 +138,17 @@ function getFormData(formElement) {
 
     return formData;
 }
-function validateCardForm() {
-    var formData = getFormData(_dom.registerCardForm);
-    var errors = [];
-    /* TODO
-       - phonenumber should be valid (python-phonenumbers)
-       - userid exists (optional)
-    */
-    /* Phone number */
-    var phone_number_invalid = validatePhoneNumber(formData.phone_number);
-    if(phone_number_invalid) {
-        set_field_state(_dom.phoneNumberField, 'error', phone_number_invalid);
-        errors.push(phone_number_invalid);
-    }
-    /* Card number */
-    var cardno_invalid = validateCardNumber(formData.card_number);
-    if(cardno_invalid) {
-        set_field_state(_dom.cardNumberField, 'error', cardno_invalid);
-        errors.push(cardno_invalid);
-    }
-    console.log("Errors: ", errors);
-
-    if(errors.length === 0) {
-        _dom.registerButton.removeAttr('disabled');
-        return true;
-    }
-    _dom.registerButton.attr('disabled','disabled');
-    return false;
-}
 
 
 var _dom;
-var register_form_fields = ['user_id', 'phone_number', 'card_number'];
 var users;
 var selectedUser;
+var cardForm = {
+    fields: {
+        cardNumber: false,
+        phoneNumber: false
+    }
+};
 
 
 $(document).ready(function(){
@@ -175,7 +174,7 @@ $(document).ready(function(){
     /* User search as you type */
     _dom.query.on('keyup', function() {
         var val = _dom.query.val().trim();
-        if(val === '') {
+        if(val.length <= 2) {
             return;
         }
         $.getJSON(urls.insideUserApi, {q: val}, function(data) {
@@ -200,8 +199,9 @@ $(document).ready(function(){
     /* Phone number as you type */
     _dom.phoneNumberField.on('input', function() {
         var val = _dom.phoneNumberField.val().trim();
-        if( validatePhoneNumber(val) !== '') {
-            set_field_state(_dom.phoneNumberField, 'error', validatePhoneNumber(val));
+        var validation_msg = validatePhoneNumber(val);
+        if( validation_msg !== '') {
+            set_field_state(_dom.phoneNumberField, 'error', validation_msg);
             return;
         }
         $.getJSON(urls.insidePhoneNumberApi, {q: val}, function(data) {
@@ -219,8 +219,9 @@ $(document).ready(function(){
     _dom.cardNumberField.on('input', function() {
         /* Card number should exist in the database and not tied to existing user */
         var val = _dom.cardNumberField.val().trim();
-        if( validateCardNumber(val) !== '' ) {
-            set_field_state(_dom.cardNumberField, 'error', validateCardNumber(val));
+        var validation_msg = validateCardNumber(val);
+        if( validation_msg !== '' ) {
+            set_field_state(_dom.cardNumberField, 'error', validation_msg);
             return;
         }
         $.getJSON(urls.insideCardNumber, {card_number: val}, function(data) {
@@ -233,7 +234,7 @@ $(document).ready(function(){
             }
             else if(data.user !== null && data.valid) {
                 var user = data.user[0];
-                set_field_state(_dom.cardNumberField, 'error', 'Card number belongs to existing user: '+ user.firstname +' '+ user.lastname +' ('+user.id+').');
+                set_field_state(_dom.cardNumberField, 'error', 'Card number is in use and belongs to existing user: '+ user.firstname +' '+ user.lastname +' ('+user.id+').');
             }
             else if(data.user === null && data.valid) {
                 set_field_state(_dom.cardNumberField, 'success');
@@ -270,7 +271,7 @@ $(document).ready(function(){
         //  - show new user below form (hide/show after 10s)
         //  - clear form
 
-        if( !validateCardForm() ) {
+        if( !cardFormIsValid() ) {
             // ERROR
             return;
         }
@@ -298,7 +299,6 @@ $(document).ready(function(){
     /* On user id change  */
     _dom.userIdField.on('change', function() {
         /* Render selected user in search form */
-        console.log("try updating selected user ", selectedUser);
         if(selectedUser) {
             render_selected_user({res: selectedUser});
             return;
