@@ -5,7 +5,7 @@ var output = "";
 try {
 if(!runtime.contextOrFrameLookup(context, frame, "placeholder")) {
 output += "\n    ";
-if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"cardno", env.opts.autoescape) || runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_is_legacy", env.opts.autoescape)) {
+if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_number_active", env.opts.autoescape)) {
 output += "\n        <label for=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"id", env.opts.autoescape), env.opts.autoescape);
 output += "\" data-phone-number=\"";
@@ -71,7 +71,7 @@ output += "</span>\n        ";
 output += "\n        <!-- Card -->\n        ";
 if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_is_legacy", env.opts.autoescape)) {
 output += "\n            <span class=\"label label-card \"><span class=\"glyphicon glyphicon-user\"></span> ";
-output += runtime.suppressValue(env.getFilter("default").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"cardno", env.opts.autoescape),"No card"), env.opts.autoescape);
+output += runtime.suppressValue(env.getFilter("default").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_number_active", env.opts.autoescape),"No card"), env.opts.autoescape);
 output += "</span>\n        ";
 ;
 }
@@ -85,7 +85,7 @@ output += "\n            <span class=\"label label-is-active\">Active</span>\n  
 ;
 }
 output += "\n    </div>\n    ";
-if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"cardno", env.opts.autoescape) || runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_is_legacy", env.opts.autoescape)) {
+if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_number_active", env.opts.autoescape)) {
 output += "\n        <div class=\"selected-icon\"><span class=\"glyphicon glyphicon-ok\"></span></div>\n        </label>\n    ";
 ;
 }
@@ -98,7 +98,7 @@ output += "\n";
 }
 else {
 output += "\n    <!-- Placeholder -->\n    <div class=\"list-group-item search-result placeholder\">\n        <input type=\"radio\" name=\"user\" checked>\n        <em>New member</em>\n        <div class=\"labels\">\n            <span class=\"label label-card \"><span class=\"glyphicon glyphicon-user\"></span> ";
-output += runtime.suppressValue(env.getFilter("default").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"cardno", env.opts.autoescape),"New card"), env.opts.autoescape);
+output += runtime.suppressValue(env.getFilter("default").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_number_active", env.opts.autoescape),"New card"), env.opts.autoescape);
 output += "</span>\n        </div>\n    </div>\n";
 ;
 }

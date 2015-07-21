@@ -81,7 +81,7 @@ def inside_register_api(request):
         'phone': post_data.get('phone_number'),
         # 'user_id': post_data.get('user_id'),
         'type': post_data.get('type'),  # 'renewal' or 'new'
-        'cardno': post_data.get('cardno'),
+        'card_number': post_data.get('card_number'),
         'source': 'physical'
     }
     url = '{}register.php'.format(settings.INSIDE_API_URL)

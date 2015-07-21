@@ -57,6 +57,10 @@ input[type=number] {
   font-weight: normal;
   line-height: 2;
 
+  &.can-register-card:hover {
+    cursor: pointer;
+  }
+
   .label {
     font-size: 1em;
   }
@@ -80,9 +84,6 @@ input[type=number] {
       visibility: visible;
     }
   }
-  &.has-card {
-    padding-left: 44px;
-  }
 }
 .selected-icon {
   visibility: hidden;
@@ -103,6 +104,25 @@ input[type=number] {
 }
 .love {
     color: #faafba;
+}
+/* Toasts */
+.toast-wrap {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background-color: rgba(0, 0, 0, .8);
+  color: white;
+  min-width: 100px;
+  padding: 18px 32px;
+  font-size: 18px;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s ease-in-out;
+
+  &.visible {
+    visibility: visible;
+    transform: translateY(0);
+  }
 }
 
 /* Header */

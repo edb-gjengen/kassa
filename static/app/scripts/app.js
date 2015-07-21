@@ -20,14 +20,44 @@ function getParameterByName(name) {
         results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
+function update_with_card_details(results) {
+    /* Cards with a number lower than this is legacy as of 2015-08 */
+    var legacy_card_limit = 100000000;
 
+    for(var i=0; i<results.length; i++) {
+        var res = results[i];
+        if(res.cards === '') {
+            continue;
+        }
+
+        for(var j=0; j<res.cards.length; j++) {
+            if(parseInt(res.cards[j].card_number, 10) < legacy_card_limit) {
+                res.cards[j].is_legacy = "1";
+            }
+            if(res.cards[j].is_active == "1") {
+                res.card_number_active = res.cards[j].card_number;
+            }
+        }
+    }
+
+    return results;
+}
 function format_results(results) {
-    return nunjucks.render('search_results.html', {'results':results});
+    return nunjucks.render('search_results.html', {'results': update_with_card_details(results)});
 }
 function render_selected_user(user_data) {
+    user_data = update_with_card_details(user_data);
     user_data.checked = true;
     var selected_user_html = nunjucks.render('search_result.html', user_data);
     _dom.selectedUserWrap.html(selected_user_html);
+}
+function set_toast(message) {
+    //var html = nunjucks.render('toast.html', {'message': message});
+    _dom.toastWrap.html(message);
+    _dom.toastWrap.addClass('visible');
+    setTimeout(function() {
+        _dom.toastWrap.removeClass('visible');
+    }, 4000);
 }
 function set_selected_user(user, update_search_result) {
     selectedUser = user;
@@ -162,7 +192,8 @@ $(document).ready(function(){
         registerButton: $('#register-submit-btn'),
         usernameField: $('#id_username'),
         userIdField: $('#id_user_id'),
-        selectedUserWrap: $('.register-card-form--selected-user-wrap')
+        selectedUserWrap: $('.register-card-form--selected-user-wrap'),
+        toastWrap: $('.toast-wrap')
     };
     var urls = {
         insideUserApi: '/inside/user/',
@@ -170,31 +201,6 @@ $(document).ready(function(){
         insideCardNumber: '/inside/cardnumber/',
         insideRegister: '/inside/register/'
     };
-
-    /* User search as you type */
-    _dom.query.on('keyup', function() {
-        var val = _dom.query.val().trim();
-        if(val.length <= 2) {
-            return;
-        }
-        $.getJSON(urls.insideUserApi, {q: val}, function(data) {
-            console.log(data);
-            if(data.results && data.results.length > 0) {
-                _dom.results.html(format_results(data.results));
-                users = data.results;
-            }
-            else if(data.error) {
-                _dom.results.html(data.error);
-            }
-            else {
-                if(val !== "") {
-                    _dom.results.html("Found no existing user with search param: '"+ val +"'");
-                } else {
-                    _dom.results.html('');
-                }
-            }
-        });
-    });
 
     /* Phone number as you type */
     _dom.phoneNumberField.on('input', function() {
@@ -253,6 +259,31 @@ $(document).ready(function(){
         });
     });
 
+    /* User search as you type */
+    _dom.query.on('keyup', function() {
+        var val = _dom.query.val().trim();
+        if(val.length <= 2) {
+            return;
+        }
+        $.getJSON(urls.insideUserApi, {q: val}, function(data) {
+            console.log(data);
+            if(data.results && data.results.length > 0) {
+                _dom.results.html(format_results(data.results));
+                users = data.results;
+            }
+            else if(data.error) {
+                _dom.results.html(data.error);
+            }
+            else {
+                if(val !== "") {
+                    _dom.results.html("Found no existing user with search param: '"+ val +"'");
+                } else {
+                    _dom.results.html('');
+                }
+            }
+        });
+    });
+
     /* On search result click */
     _dom.results.on('click', '.search-result input', function(e){
         var label = $(this).parent();
@@ -299,9 +330,11 @@ $(document).ready(function(){
             headers: {'X-CSRFToken': getCookie('csrftoken')}
         }).success(function(data){
             console.log("success", data);
+            set_toast('Success :-)');
 
         }).fail(function(data) {
             console.log("failed", data);
+            set_toast('Failed!');
         });
     });
 
