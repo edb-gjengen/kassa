@@ -39,7 +39,7 @@ function update_user_with_card_details(user) {
 }
 function format_results(results) {
     results = _.map(results, update_user_with_card_details);
-    return nunjucks.render('search_results.html', {'results': results});
+    return nunjucksEnv.render('search_results.html', {'results': results});
 }
 function render_selected_user(user_data) {
     var context;
@@ -49,12 +49,17 @@ function render_selected_user(user_data) {
         user_data = update_user_with_card_details(user_data);
         context = {res: user_data, checked: true};
     }
-    var selected_user_html = nunjucks.render('search_result.html', context);
+    var selected_user_html = nunjucksEnv.render('search_result.html', context);
     _dom.selectedUserWrap.html(selected_user_html);
 }
-function set_toast(message) {
-    //var html = nunjucks.render('toast.html', {'message': message});
-    _dom.toastWrap.html(message);
+function set_toast(message, message_type) {
+    var context = {
+        message: message,
+        message_type: message_type,
+        icon: state_to_icon[message_type]
+    };
+    var html = nunjucksEnv.render('toast.html', context);
+    _dom.toastWrap.html(html);
     _dom.toastWrap.addClass('visible');
     setTimeout(function() {
         _dom.toastWrap.removeClass('visible');
@@ -83,11 +88,6 @@ function set_field_state(field_element, state, help_text) {
         help_text = '';
     }
     var help_span = '<span class="help-block ">'+ help_text +'</span>';
-    var state_to_icon = {
-        success: 'ok',
-        warning: 'warning-sign',
-        error: 'remove'
-    };
     var feedback_span = '<span class="glyphicon glyphicon-'+ state_to_icon[state] +' form-control-feedback" aria-hidden="true"></span>';
     var css_class = 'has-'+state;
     var form_group = field_element.parent().parent();
@@ -128,6 +128,9 @@ function resetCardForm(reset_native) {
     cardForm.fields.cardNumber = false;
     selectedUser = null;
     _dom.userIdField.val('').trigger('change');
+
+    /* Disable submit button */
+    _dom.registerSubmitButton.prop('disabled', true);
 }
 
 function cardFormIsValid() {
@@ -182,7 +185,7 @@ function getFormData(formElement) {
     return formData;
 }
 
-
+/* Init and global vars */
 var _dom;
 var users;
 var selectedUser;
@@ -192,6 +195,13 @@ var cardForm = {
         phoneNumber: false
     }
 };
+var state_to_icon = {
+    success: 'ok',
+    warning: 'warning-sign',
+    error: 'remove'
+};
+var nunjucksEnv = new nunjucks.Environment();
+
 
 
 $(document).ready(function(){
@@ -215,6 +225,17 @@ $(document).ready(function(){
         insideCardNumber: '/inside/cardnumber/',
         insideRegister: '/inside/register/'
     };
+    /* Add filter |phoneNumber */
+    nunjucksEnv.addFilter('phoneNumber', function(str) {
+        if(!str || str.length <= 1) {
+            return 'No phone number';
+        }
+        if(str.length == 11) {
+            return str.slice(0, 3) + " " + str.slice(3, 6) + " " + str.slice(6, 8) + " " + str.slice(8);
+        }
+
+        return str;
+    });
 
     /* Phone number as you type */
     _dom.phoneNumberField.on('input', function() {
@@ -300,7 +321,7 @@ $(document).ready(function(){
 
     /* On search result click */
     _dom.results.on('click', '.search-result input', function(e){
-        var label = $(this).parent();
+        var label = $(this).parent().parent();
         var number = label.attr('data-phone-number');
         var user_id = label.attr('data-user-id');
 
@@ -343,17 +364,16 @@ $(document).ready(function(){
             type: 'post',
             headers: {'X-CSRFToken': getCookie('csrftoken')}
         }).success(function(data){
-            console.log("success", data);
-            set_toast('Success :-)');
+            set_toast('Success :-)', 'success');
             resetCardForm(true);
 
         }).fail(function(data) {
             console.log("failed", data);
-            set_toast('Failed!');
+            set_toast('Failed!'+ data.error, 'error');
         });
     });
 
-    /* On user id change  */
+    /* On user id change */
     _dom.userIdField.on('change', function() {
         /* Render selected user in search form */
         if(selectedUser) {
@@ -368,9 +388,13 @@ $(document).ready(function(){
     });
 
     /* Ninja add some icons to bootstrap form */
-    var iconMobile = '<span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>';
+    var iconMobile = '<span class="input-group-addon"><span class="glyphicon glyphicon-phone glyphicon-phone-large"></span></span>';
     _dom.phoneNumberField.parent().addClass('input-group');
     _dom.phoneNumberField.before(iconMobile);
+
+    /* Render initial placeholder user */
+    var selected_user_html = nunjucksEnv.render('search_result.html', {placeholder: true, res: {number: '+4748105885'}});
+    _dom.selectedUserWrap.html(selected_user_html);
 
     /* Initial focus */
     if(_dom.usernameField) {
@@ -379,8 +403,6 @@ $(document).ready(function(){
     if(_dom.phoneNumberField) {
         _dom.phoneNumberField.focus();
     }
-    /* Initial submit button state disabled */
-    _dom.registerSubmitButton.attr('disabled','disabled');
 
     /* Load query params */
     /* FIXME: does not trigger validation and selected user preview */

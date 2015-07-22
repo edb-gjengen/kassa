@@ -2,40 +2,31 @@
 {% load i18n bootstrap %}
 {% block content %}
 <div class="row">
-    <div class="col-sm-5">
+    <div class="col-sm-5 section-card-form">
         <form class="register-card-form" autocomplete="off">
             {% csrf_token %}
             <h3>{% trans "Register card" %}</h3>
             <ul>
+                <li>Add membership for new user</li>
+                <li>Add membership for existing user</li>
+                <li>Renew membership for existing user</li>
+            </ul>
+            <ul>
                 <li>Register card to existing user [DONE]</li>
                 <li>Replace card for existing user [DONE]</li>
             </ul>
-            <ul>
-                <li>Renew membership for existing user</li>
-                <li>Register membership for existing user</li>
-                <li>Register membership for new user</li>
-            </ul>
-            <div class="register-card-form--selected-user-wrap">
-                <!-- Placeholder -->
-                <div class="list-group-item search-result placeholder">
-                    <input type="radio" name="user" checked>
-                    <em>New member</em>
-                    <div class="labels">
-                        <span class="label label-card "><span class="glyphicon glyphicon-user"></span> New card</span>
-                    </div>
-                </div>
-            </div>
+            <div class="register-card-form--selected-user-wrap"></div>
             {{ add_card_form|bootstrap }}
             <p><em>Registering a card number with a phone number already tied to an existing user, will add the card to that user.</em></p>
-            <button id="register-submit-btn" type="submit" class="btn btn-primary btn-lg">{% trans "Register card" %}</button>
+            <button id="register-submit-btn" type="submit" class="btn btn-primary btn-lg" disabled>{% trans "Register card" %}</button>
             <button type="reset" class="register-reset-btn btn btn-default">{% trans "Reset" %}</button>
         </form>
     </div>
-    <div class="col-sm-7">
+    <div class="col-sm-7 section-search">
         <h3>{% trans "Search existing users" %}</h3>
-        <em>{% trans "Firstname, lastname, card number, email" %}</em>
         <form class="form-inline query-form" autocomplete="off">
             {{ search_user_form|bootstrap_inline }}
+            <button type="reset" class="btn btn-default">Reset</button>
         </form>
         <div class="results-wrap"></div>
     </div>

@@ -21,14 +21,7 @@ else {
 output += " not-member";
 ;
 }
-output += "\">\n        <input type=\"radio\" name=\"user\" id=\"";
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"id", env.opts.autoescape), env.opts.autoescape);
-output += "\"";
-if(runtime.contextOrFrameLookup(context, frame, "checked")) {
-output += " checked";
-;
-}
-output += ">\n    ";
+output += "\">\n    ";
 ;
 }
 else {
@@ -44,11 +37,25 @@ output += "not-member";
 output += "\">\n    ";
 ;
 }
-output += "\n    <!-- Name -->\n    <span class=\"glyphicon glyphicon-user\"></span> ";
+output += "\n    <div class=\"name\">\n        ";
+if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_number_active", env.opts.autoescape)) {
+output += "\n            <input type=\"radio\" name=\"user\" id=\"";
+output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"id", env.opts.autoescape), env.opts.autoescape);
+output += "\"";
+if(runtime.contextOrFrameLookup(context, frame, "checked")) {
+output += " checked";
+;
+}
+output += ">\n        ";
+;
+}
+output += "\n        <!-- Name -->\n        <span class=\"glyphicon glyphicon-user\"></span> ";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"firstname", env.opts.autoescape), env.opts.autoescape);
 output += " ";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"lastname", env.opts.autoescape), env.opts.autoescape);
-output += "\n    <div class=\"labels\">\n        <!-- Membership -->\n        ";
+output += "\n    </div>\n    <!-- Phone number -->\n    <div class=\"phone-number\"><span class=\"glyphicon glyphicon-phone\"></span> ";
+output += runtime.suppressValue(env.getFilter("phoneNumber").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"number", env.opts.autoescape)), env.opts.autoescape);
+output += "</div>\n    <div class=\"labels\">\n        <!-- Membership -->\n        ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"is_member", env.opts.autoescape) == "1") {
 output += "\n            <span class=\"label label-success\">Member: ";
 output += runtime.suppressValue(env.getFilter("default").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"expires", env.opts.autoescape),"Lifelong"), env.opts.autoescape);
@@ -97,9 +104,9 @@ output += "\n";
 ;
 }
 else {
-output += "\n    <!-- Placeholder -->\n    <div class=\"list-group-item search-result placeholder\">\n        <input type=\"radio\" name=\"user\" checked>\n        <em>New member</em>\n        <div class=\"labels\">\n            <span class=\"label label-card \"><span class=\"glyphicon glyphicon-user\"></span> ";
-output += runtime.suppressValue(env.getFilter("default").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_number_active", env.opts.autoescape),"New card"), env.opts.autoescape);
-output += "</span>\n        </div>\n    </div>\n";
+output += "\n    <!-- Placeholder -->\n    <div class=\"list-group-item search-result placeholder\">\n        <input type=\"radio\" name=\"user\" checked>\n        <span class=\"glyphicon glyphicon-user\"></span> <em>New member</em>\n        <div class=\"phone-number\"><span class=\"glyphicon glyphicon-phone\"></span> ";
+output += runtime.suppressValue(env.getFilter("phoneNumber").call(context, runtime.contextOrFrameLookup(context, frame, "number")), env.opts.autoescape);
+output += "</div>\n        <div class=\"labels\">\n            <span class=\"label label-card\">New card</span>\n        </div>\n    </div>\n";
 ;
 }
 cb(null, output);
@@ -145,6 +152,30 @@ output += "\n    ";
 }
 frame = frame.pop();
 output += "\n</div>";
+cb(null, output);
+;
+} catch (e) {
+  cb(runtime.handleError(e, lineno, colno));
+}
+}
+return {
+root: root
+};
+})();
+})();
+
+(function() {(window.nunjucksPrecompiled = window.nunjucksPrecompiled || {})["toast.html"] = (function() {function root(env, context, frame, runtime, cb) {
+var lineno = null;
+var colno = null;
+var output = "";
+try {
+output += "<span class=\"toast-";
+output += runtime.suppressValue(runtime.contextOrFrameLookup(context, frame, "message_type"), env.opts.autoescape);
+output += "\"><span class=\"glyphicon glyphicon-";
+output += runtime.suppressValue(runtime.contextOrFrameLookup(context, frame, "icon"), env.opts.autoescape);
+output += "\"></span> ";
+output += runtime.suppressValue(runtime.contextOrFrameLookup(context, frame, "message"), env.opts.autoescape);
+output += "</span>";
 cb(null, output);
 ;
 } catch (e) {

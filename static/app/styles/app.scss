@@ -1,5 +1,8 @@
 $icon-font-path: '../fonts/';
-$green: #5cb85c;
+$green-color: #5cb85c;
+$red-color: #ff433d;
+$yellow-color: #f8ff5b;
+$active-color: darkred;
 
 /* Vendor styles */
 @import "../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
@@ -49,7 +52,7 @@ input[type=number] {
     line-height: 46px;
   }
 }
-.glyphicon-phone {
+.glyphicon-phone-large {
   font-size: 26px;
 }
 .register-card-form--selected-user-wrap {
@@ -67,7 +70,10 @@ input[type=number] {
   &.can-register-card:hover {
     cursor: pointer;
   }
-
+  .phone-number,
+  .labels {
+      margin-left: 21px;
+  }
   .label {
     font-size: 1em;
   }
@@ -76,10 +82,10 @@ input[type=number] {
     color: #555;
   }
   .label-card-yes {
-    color: $green;
+    color: $green-color;
   }
   .label-is-active {
-    background-color: darkred;
+    background-color: $active-color;
   }
   [type=radio] {
     margin-right: 4px;
@@ -95,13 +101,28 @@ input[type=number] {
     }
   }
 }
+/* Search form */
 .selected-icon {
   visibility: hidden;
   float: right;
-  bottom: 48px;
+  bottom: 66px;
+  right: 10px;
   position: relative;
-  font-size: 1.5em;
-  color: $green;
+  font-size: 2em;
+  color: $green-color;
+}
+#id_query {
+  width: 100%;
+}
+.query-form .form-group {
+  width: 80%;
+  display: inline-block;
+
+}
+
+.results-wrap {
+  overflow-y: auto;
+  max-height: 550px;
 }
 
 /* Footer */
@@ -133,6 +154,18 @@ input[type=number] {
     visibility: visible;
     transform: translateY(0);
   }
+  .glyphicon {
+    padding-right: 10px;
+  }
+}
+.toast-success {
+  color: $green-color;
+}
+.toast-error {
+  color: $red-color;
+}
+.toast-warning {
+  color: $yellow-color;
 }
 
 /* Header */

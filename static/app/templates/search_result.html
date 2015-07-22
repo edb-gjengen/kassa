@@ -1,13 +1,19 @@
 {% if not placeholder %}
     {% if not res.card_number_active %}
         <label for="{{ res.id }}" data-phone-number="{{ res.number }}" data-user-id="{{ res.id }}" class="list-group-item search-result can-register-card{% if res.is_member == "1" %} member{% else %} not-member{% endif %}">
-        <input type="radio" name="user" id="{{ res.id }}"{% if checked %} checked{% endif %}>
     {% else %}
         <!-- Has card -->
         <div class="list-group-item search-result has-card{% if res.is_member %} member{% else %}not-member{% endif %}">
     {% endif %}
-    <!-- Name -->
-    <span class="glyphicon glyphicon-user"></span> {{ res.firstname }} {{ res.lastname }}
+    <div class="name">
+        {% if not res.card_number_active %}
+            <input type="radio" name="user" id="{{ res.id }}"{% if checked %} checked{% endif %}>
+        {% endif %}
+        <!-- Name -->
+        <span class="glyphicon glyphicon-user"></span> {{ res.firstname }} {{ res.lastname }}
+    </div>
+    <!-- Phone number -->
+    <div class="phone-number"><span class="glyphicon glyphicon-phone"></span> {{ res.number|phoneNumber }}</div>
     <div class="labels">
         <!-- Membership -->
         {% if res.is_member == "1" %}
@@ -38,9 +44,10 @@
     <!-- Placeholder -->
     <div class="list-group-item search-result placeholder">
         <input type="radio" name="user" checked>
-        <em>New member</em>
+        <span class="glyphicon glyphicon-user"></span> <em>New member</em>
+        <div class="phone-number"><span class="glyphicon glyphicon-phone"></span> {{ number|phoneNumber }}</div>
         <div class="labels">
-            <span class="label label-card "><span class="glyphicon glyphicon-user"></span> {{ res.card_number_active|default('New card') }}</span>
+            <span class="label label-card">New card</span>
         </div>
     </div>
 {% endif %}

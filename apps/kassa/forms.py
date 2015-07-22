@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 class SearchUserForm(forms.Form):
     query = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={'placeholder': _('Search')})
+        widget=forms.TextInput(attrs={'placeholder': _('Firstname, lastname, card number or email')})
     )
 
 
