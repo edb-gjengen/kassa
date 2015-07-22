@@ -20,35 +20,36 @@ function getParameterByName(name) {
         results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
-function update_with_card_details(results) {
+function update_user_with_card_details(user) {
     /* Cards with a number lower than this is legacy as of 2015-08 */
     var legacy_card_limit = 100000000;
-
-    for(var i=0; i<results.length; i++) {
-        var res = results[i];
-        if(res.cards === '') {
-            continue;
-        }
-
-        for(var j=0; j<res.cards.length; j++) {
-            if(parseInt(res.cards[j].card_number, 10) < legacy_card_limit) {
-                res.cards[j].is_legacy = "1";
-            }
-            if(res.cards[j].is_active == "1") {
-                res.card_number_active = res.cards[j].card_number;
-            }
-        }
+    if(user.cards === '') {
+        return user;
     }
 
-    return results;
+    for(var j=0; j<user.cards.length; j++) {
+        if(parseInt(user.cards[j].card_number, 10) < legacy_card_limit) {
+            user.cards[j].is_legacy = "1";
+        }
+        if(user.cards[j].is_active == "1") {
+            user.card_number_active = user.cards[j].card_number;
+        }
+    }
+    return user;
 }
 function format_results(results) {
-    return nunjucks.render('search_results.html', {'results': update_with_card_details(results)});
+    results = _.map(results, update_user_with_card_details);
+    return nunjucks.render('search_results.html', {'results': results});
 }
 function render_selected_user(user_data) {
-    user_data = update_with_card_details(user_data);
-    user_data.checked = true;
-    var selected_user_html = nunjucks.render('search_result.html', user_data);
+    var context;
+    if(user_data === undefined) {
+        context = {placeholder: true};  // dummy card
+    } else {
+        user_data = update_user_with_card_details(user_data);
+        context = {res: user_data, checked: true};
+    }
+    var selected_user_html = nunjucks.render('search_result.html', context);
     _dom.selectedUserWrap.html(selected_user_html);
 }
 function set_toast(message) {
@@ -116,6 +117,18 @@ function set_field_state(field_element, state, help_text) {
         form_group.find('.help-block').remove();
     }
 }
+function resetCardForm(reset_native) {
+    if(reset_native) {
+        _dom.registerCardForm.get(0).reset();
+    }
+    /* Clear field states */
+    set_field_state(_dom.phoneNumberField, '');
+    cardForm.fields.phoneNumber = false;
+    set_field_state(_dom.cardNumberField, '');
+    cardForm.fields.cardNumber = false;
+    selectedUser = null;
+    _dom.userIdField.val('').trigger('change');
+}
 
 function cardFormIsValid() {
     return _.all(_.values(cardForm.fields));
@@ -123,10 +136,10 @@ function cardFormIsValid() {
 
 function update_submit_button() {
     if( cardFormIsValid() ) {
-        _dom.registerButton.prop('disabled', false);
+        _dom.registerSubmitButton.prop('disabled', false);
         return;
     }
-    _dom.registerButton.prop('disabled', true);
+    _dom.registerSubmitButton.prop('disabled', true);
 }
 function validatePhoneNumber(val) {
     if(val.length === 0) {
@@ -189,11 +202,12 @@ $(document).ready(function(){
         phoneNumberField: $('#id_phone_number'),
         cardNumberField: $('#id_card_number'),
         registerCardForm: $('.register-card-form'),
-        registerButton: $('#register-submit-btn'),
+        registerSubmitButton: $('#register-submit-btn'),
         usernameField: $('#id_username'),
         userIdField: $('#id_user_id'),
         selectedUserWrap: $('.register-card-form--selected-user-wrap'),
-        toastWrap: $('.toast-wrap')
+        toastWrap: $('.toast-wrap'),
+        registerResetButton: $('.register-reset-btn')
     };
     var urls = {
         insideUserApi: '/inside/user/',
@@ -303,7 +317,7 @@ $(document).ready(function(){
         _dom.phoneNumberField.val(number).trigger('input');
     });
 
-    _dom.registerButton.on('click', function(e) {
+    _dom.registerSubmitButton.on('click', function(e) {
         e.preventDefault();
         // TODO on error output validation status
         // TODO on success:
@@ -330,11 +344,12 @@ $(document).ready(function(){
             headers: {'X-CSRFToken': getCookie('csrftoken')}
         }).success(function(data){
             console.log("success", data);
-            set_toast('Success! '+ data);
+            set_toast('Success :-)');
+            resetCardForm(true);
 
         }).fail(function(data) {
             console.log("failed", data);
-            set_toast('Failed! '+ data);
+            set_toast('Failed!');
         });
     });
 
@@ -342,16 +357,19 @@ $(document).ready(function(){
     _dom.userIdField.on('change', function() {
         /* Render selected user in search form */
         if(selectedUser) {
-            render_selected_user({res: selectedUser});
+            render_selected_user(selectedUser);
             return;
         }
-        render_selected_user({placeholder: true});
+        render_selected_user();
+    });
+    _dom.registerResetButton.on('click', function() {
+        console.log('reset!');
+        resetCardForm();
     });
 
     /* Ninja add some icons to bootstrap form */
-    var inputGroup = '<div class="input-group">';
     var iconMobile = '<span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>';
-    _dom.phoneNumberField.wrap(inputGroup);
+    _dom.phoneNumberField.parent().addClass('input-group');
     _dom.phoneNumberField.before(iconMobile);
 
     /* Initial focus */
@@ -362,7 +380,7 @@ $(document).ready(function(){
         _dom.phoneNumberField.focus();
     }
     /* Initial submit button state disabled */
-    _dom.registerButton.attr('disabled','disabled');
+    _dom.registerSubmitButton.attr('disabled','disabled');
 
     /* Load query params */
     /* FIXME: does not trigger validation and selected user preview */

@@ -7,7 +7,7 @@
         <div class="list-group-item search-result has-card{% if res.is_member %} member{% else %}not-member{% endif %}">
     {% endif %}
     <!-- Name -->
-    {{ res.firstname }} {{ res.lastname }}
+    <span class="glyphicon glyphicon-user"></span> {{ res.firstname }} {{ res.lastname }}
     <div class="labels">
         <!-- Membership -->
         {% if res.is_member == "1" %}
@@ -18,10 +18,10 @@
             <span class="label label-warning">Expired: {{ res.expires }}</span>
         {% endif %}
         <!-- Card -->
-        {% if not res.card_is_legacy %}
-            <span class="label label-card "><span class="glyphicon glyphicon-user"></span> {{ res.card_number_active|default('No card') }}</span>
+        {% if res.card_number_active and res.card_is_legacy != '' %}
+            <span class="label label-card label-card-yes"><span class="glyphicon glyphicon-ok"></span> {{ res.card_number_active }}</span>
         {% else %}
-            <span class="label label-card "><span class="glyphicon glyphicon-user"></span> No card</span>
+            <span class="label label-card label-card-no"><span class="glyphicon glyphicon-remove"></span> No card</span>
         {% endif %}
         <!-- Is active -->
         {% if res.is_active == "1" %}

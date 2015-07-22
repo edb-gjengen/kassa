@@ -1,4 +1,5 @@
 $icon-font-path: '../fonts/';
+$green: #5cb85c;
 
 /* Vendor styles */
 @import "../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
@@ -25,6 +26,12 @@ input[type=number] {
 .login-form--forgot-password {
   text-align: right;
   margin-top: 10px;
+}
+.query-form input {
+    height: 46px;
+    padding: 10px 16px;
+    font-size: 18px;
+    line-height: 1.3333333;
 }
 .register-card-form {
 
@@ -68,6 +75,9 @@ input[type=number] {
     border: 1px solid #555;
     color: #555;
   }
+  .label-card-yes {
+    color: $green;
+  }
   .label-is-active {
     background-color: darkred;
   }
@@ -91,7 +101,7 @@ input[type=number] {
   bottom: 48px;
   position: relative;
   font-size: 1.5em;
-  color: #5cb85c;
+  color: $green;
 }
 
 /* Footer */
