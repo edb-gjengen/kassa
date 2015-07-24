@@ -47,7 +47,7 @@ function render_selected_user(user_data) {
         context = {placeholder: true};  // dummy card
     } else {
         user_data = update_user_with_card_details(user_data);
-        context = {res: user_data, checked: true};
+        context = {res: user_data, checked: true, no_user_actions: true};
     }
     var selected_user_html = nunjucksEnv.render('search_result.html', context);
     _dom.selectedUserWrap.html(selected_user_html);
@@ -131,6 +131,14 @@ function resetCardForm(reset_native) {
 
     /* Disable submit button */
     _dom.registerSubmitButton.prop('disabled', true);
+}
+function resetSearchForm(reset_native) {
+    if(reset_native) {
+        _dom.searchResetButton.get(0).reset();
+    }
+    /* Clear search results */
+    users = null;
+    _dom.results.html('');
 }
 
 function cardFormIsValid() {
@@ -217,7 +225,8 @@ $(document).ready(function(){
         userIdField: $('#id_user_id'),
         selectedUserWrap: $('.register-card-form--selected-user-wrap'),
         toastWrap: $('.toast-wrap'),
-        registerResetButton: $('.register-reset-btn')
+        registerResetButton: $('.register-reset-btn'),
+        searchResetButton: $('.search-reset-btn')
     };
     var urls = {
         insideUserApi: '/inside/user/',
@@ -251,7 +260,7 @@ $(document).ready(function(){
                 set_selected_user(data.results[0], true);
             } else {
                 set_field_state(_dom.phoneNumberField, '');
-                set_selected_user('', true);
+                set_selected_user(null, true);
             }
             cardForm.fields.phoneNumber = true;
             update_submit_button();
@@ -295,9 +304,10 @@ $(document).ready(function(){
     });
 
     /* User search as you type */
-    _dom.query.on('keyup', function() {
+    _dom.query.on('input', function() {
         var val = _dom.query.val().trim();
         if(val.length <= 2) {
+            _dom.results.html('');
             return;
         }
         $.getJSON(urls.insideUserApi, {q: val}, function(data) {
@@ -321,7 +331,7 @@ $(document).ready(function(){
 
     /* On search result click */
     _dom.results.on('click', '.search-result input', function(e){
-        var label = $(this).parent().parent();
+        var label = $(this).parent();
         var number = label.attr('data-phone-number');
         var user_id = label.attr('data-user-id');
 
@@ -382,9 +392,12 @@ $(document).ready(function(){
         }
         render_selected_user();
     });
+    /* Reset buttons */
     _dom.registerResetButton.on('click', function() {
-        console.log('reset!');
         resetCardForm();
+    });
+    _dom.searchResetButton.on('click', function() {
+        resetSearchForm();
     });
 
     /* Ninja add some icons to bootstrap form */
@@ -393,7 +406,7 @@ $(document).ready(function(){
     _dom.phoneNumberField.before(iconMobile);
 
     /* Render initial placeholder user */
-    var selected_user_html = nunjucksEnv.render('search_result.html', {placeholder: true, res: {number: '+4748105885'}});
+    var selected_user_html = nunjucksEnv.render('search_result.html', {placeholder: true});
     _dom.selectedUserWrap.html(selected_user_html);
 
     /* Initial focus */

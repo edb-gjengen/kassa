@@ -6,27 +6,31 @@
         <form class="register-card-form" autocomplete="off">
             {% csrf_token %}
             <h3>{% trans "Register card" %}</h3>
-            <ul>
-                <li>Add membership for new user</li>
-                <li>Add membership for existing user</li>
-                <li>Renew membership for existing user</li>
-            </ul>
-            <ul>
-                <li>Register card to existing user [DONE]</li>
-                <li>Replace card for existing user [DONE]</li>
-            </ul>
-            <div class="register-card-form--selected-user-wrap"></div>
+            <p><!--
+                Add membership for new user and existing user.
+                Renew membership for existing user.
+                Register card to existing user [DONE].
+                Replace card for existing user [DONE]
+                -->
+                </p>
+            <div class="register-card-form--selected-user-section">
+                <label>{% trans "Member" %}</label>
+                <div class="register-card-form--selected-user-wrap"></div>
+            </div>
             {{ add_card_form|bootstrap }}
-            <p><em>Registering a card number with a phone number already tied to an existing user, will add the card to that user.</em></p>
+            <ul>
+                <li>Registering a card number with a phone number already tied to an existing user, will add the card to that user.</li>
+                <li>If no existing membership can be found, a new membership is registered (or renewed).</li>
+            </ul>
             <button id="register-submit-btn" type="submit" class="btn btn-primary btn-lg" disabled>{% trans "Register card" %}</button>
             <button type="reset" class="register-reset-btn btn btn-default">{% trans "Reset" %}</button>
         </form>
     </div>
     <div class="col-sm-7 section-search">
-        <h3>{% trans "Search existing users" %}</h3>
+        <h3>{% trans "Search members" %}</h3>
         <form class="form-inline query-form" autocomplete="off">
             {{ search_user_form|bootstrap_inline }}
-            <button type="reset" class="btn btn-default">Reset</button>
+            <button type="reset" class="btn btn-default search-reset-btn">Reset</button>
         </form>
         <div class="results-wrap"></div>
     </div>

@@ -4,9 +4,7 @@ var colno = null;
 var output = "";
 try {
 if(!runtime.contextOrFrameLookup(context, frame, "placeholder")) {
-output += "\n    ";
-if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_number_active", env.opts.autoescape)) {
-output += "\n        <label for=\"";
+output += "\n    <label for=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"id", env.opts.autoescape), env.opts.autoescape);
 output += "\" data-phone-number=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"number", env.opts.autoescape), env.opts.autoescape);
@@ -21,35 +19,14 @@ else {
 output += " not-member";
 ;
 }
-output += "\">\n    ";
-;
-}
-else {
-output += "\n        <!-- Has card -->\n        <div class=\"list-group-item search-result has-card";
-if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"is_member", env.opts.autoescape)) {
-output += " member";
-;
-}
-else {
-output += "not-member";
-;
-}
-output += "\">\n    ";
-;
-}
-output += "\n    <div class=\"name\">\n        ";
-if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_number_active", env.opts.autoescape)) {
-output += "\n            <input type=\"radio\" name=\"user\" id=\"";
+output += "\">\n    <input type=\"radio\" name=\"user\" id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"id", env.opts.autoescape), env.opts.autoescape);
 output += "\"";
 if(runtime.contextOrFrameLookup(context, frame, "checked")) {
 output += " checked";
 ;
 }
-output += ">\n        ";
-;
-}
-output += "\n        <!-- Name -->\n        <span class=\"glyphicon glyphicon-user\"></span> ";
+output += ">\n    <div class=\"name\">\n        <span class=\"glyphicon glyphicon-user\"></span> ";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"firstname", env.opts.autoescape), env.opts.autoescape);
 output += " ";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"lastname", env.opts.autoescape), env.opts.autoescape);
@@ -92,19 +69,22 @@ output += "\n            <span class=\"label label-is-active\">Active</span>\n  
 ;
 }
 output += "\n    </div>\n    ";
-if(!runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_number_active", env.opts.autoescape)) {
-output += "\n        <div class=\"selected-icon\"><span class=\"glyphicon glyphicon-ok\"></span></div>\n        </label>\n    ";
+if(!runtime.contextOrFrameLookup(context, frame, "no_user_actions")) {
+output += "\n        <div class=\"user-actions\">\n            <div class=\"btn-group\">\n                <a href=\"#\" class=\"btn btn-default";
+if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"is_member", env.opts.autoescape) == "1") {
+output += " disabled";
+;
+}
+output += "\">Membership</a>\n                <a href=\"#\" class=\"btn btn-default\">Reg. card</a>\n                <div class=\"btn-group\" role=\"group\">\n                    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n                        <span class=\"glyphicon glyphicon-option-vertical\"></span>\n                    </button>\n                    <ul class=\"dropdown-menu\">\n                        <li><a href=\"https://inside.studentersamfundet.no/index.php?page=display-user&userid=";
+output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"id", env.opts.autoescape), env.opts.autoescape);
+output += "\" target=\"_blank\">Edit in Inside</a></li>\n                    </ul>\n              </div>\n            </div>\n        </div>\n    ";
+;
+}
+output += "\n    </label>\n";
 ;
 }
 else {
-output += "\n        </div>\n    ";
-;
-}
-output += "\n";
-;
-}
-else {
-output += "\n    <!-- Placeholder -->\n    <div class=\"list-group-item search-result placeholder\">\n        <input type=\"radio\" name=\"user\" checked>\n        <span class=\"glyphicon glyphicon-user\"></span> <em>New member</em>\n        <div class=\"phone-number\"><span class=\"glyphicon glyphicon-phone\"></span> ";
+output += "\n    <!-- Placeholder -->\n    <div class=\"list-group-item search-result placeholder\">\n        <div class=\"name\">\n            <input type=\"radio\" name=\"user\" checked>\n            <span class=\"glyphicon glyphicon-user\"></span> <em>New member</em>\n        </div>\n        <div class=\"phone-number\"><span class=\"glyphicon glyphicon-phone\"></span> ";
 output += runtime.suppressValue(env.getFilter("phoneNumber").call(context, runtime.contextOrFrameLookup(context, frame, "number")), env.opts.autoescape);
 output += "</div>\n        <div class=\"labels\">\n            <span class=\"label label-card\">New card</span>\n        </div>\n    </div>\n";
 ;

@@ -57,12 +57,13 @@ input[type=number] {
 }
 .register-card-form--selected-user-wrap {
   min-height: 78px;
-  margin: 10px 0;
+  margin-bottom: 10px;
 }
 
 .query-form {
   margin-bottom: 20px;
 }
+/* Search result / User */
 .search-result {
   font-weight: normal;
   line-height: 2;
@@ -88,7 +89,10 @@ input[type=number] {
     background-color: $active-color;
   }
   [type=radio] {
-    margin-right: 4px;
+    position: absolute;
+    top: 42px;
+    transform: scale(1.5);
+    left: 10px;
 
     &:focus {
       outline: none;
@@ -100,7 +104,21 @@ input[type=number] {
       visibility: visible;
     }
   }
+  .name {
+    margin-left: 21px;
+  }
 }
+.user-actions {
+  position: absolute;
+  right: 16px;
+  top: 40px;
+  visibility: hidden;
+}
+.selected .user-actions {
+  visibility: visible;
+}
+
+
 /* Search form */
 .selected-icon {
   visibility: hidden;
@@ -119,11 +137,12 @@ input[type=number] {
   display: inline-block;
 
 }
-
-.results-wrap {
-  overflow-y: auto;
-  max-height: 550px;
-}
+/*@media (min-width: $screen-sm-min) {
+  .results-wrap {
+    overflow-y: auto;
+    max-height: 550px;
+  }
+}*/
 
 /* Footer */
 .credits {

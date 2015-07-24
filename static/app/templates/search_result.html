@@ -1,15 +1,7 @@
 {% if not placeholder %}
-    {% if not res.card_number_active %}
-        <label for="{{ res.id }}" data-phone-number="{{ res.number }}" data-user-id="{{ res.id }}" class="list-group-item search-result can-register-card{% if res.is_member == "1" %} member{% else %} not-member{% endif %}">
-    {% else %}
-        <!-- Has card -->
-        <div class="list-group-item search-result has-card{% if res.is_member %} member{% else %}not-member{% endif %}">
-    {% endif %}
+    <label for="{{ res.id }}" data-phone-number="{{ res.number }}" data-user-id="{{ res.id }}" class="list-group-item search-result can-register-card{% if res.is_member == "1" %} member{% else %} not-member{% endif %}">
+    <input type="radio" name="user" id="{{ res.id }}"{% if checked %} checked{% endif %}>
     <div class="name">
-        {% if not res.card_number_active %}
-            <input type="radio" name="user" id="{{ res.id }}"{% if checked %} checked{% endif %}>
-        {% endif %}
-        <!-- Name -->
         <span class="glyphicon glyphicon-user"></span> {{ res.firstname }} {{ res.lastname }}
     </div>
     <!-- Phone number -->
@@ -34,17 +26,30 @@
             <span class="label label-is-active">Active</span>
         {% endif %}
     </div>
-    {% if not res.card_number_active %}
-        <div class="selected-icon"><span class="glyphicon glyphicon-ok"></span></div>
-        </label>
-    {% else %}
+    {% if not no_user_actions %}
+        <div class="user-actions">
+            <div class="btn-group">
+                <a href="#" class="btn btn-default{% if res.is_member == "1" %} disabled{% endif %}">Membership</a>
+                <a href="#" class="btn btn-default">Reg. card</a>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="glyphicon glyphicon-option-vertical"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="https://inside.studentersamfundet.no/index.php?page=display-user&userid={{ res.id }}" target="_blank">Edit in Inside</a></li>
+                    </ul>
+              </div>
+            </div>
         </div>
     {% endif %}
+    </label>
 {% else %}
     <!-- Placeholder -->
     <div class="list-group-item search-result placeholder">
-        <input type="radio" name="user" checked>
-        <span class="glyphicon glyphicon-user"></span> <em>New member</em>
+        <div class="name">
+            <input type="radio" name="user" checked>
+            <span class="glyphicon glyphicon-user"></span> <em>New member</em>
+        </div>
         <div class="phone-number"><span class="glyphicon glyphicon-phone"></span> {{ number|phoneNumber }}</div>
         <div class="labels">
             <span class="label label-card">New card</span>
