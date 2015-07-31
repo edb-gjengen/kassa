@@ -37,13 +37,25 @@ function update_user_with_card_details(user) {
     }
     return user;
 }
+
+function format_phone_number(str) {
+    if(!str || str.length <= 1) {
+        return 'No phone number';
+    }
+    if(str.length == 11) {
+        return str.slice(0, 3) + " " + str.slice(3, 6) + " " + str.slice(6, 8) + " " + str.slice(8);
+    }
+
+    return str;
+}
+
 function format_results(results) {
     results = _.map(results, update_user_with_card_details);
     return nunjucksEnv.render('search_results.html', {'results': results});
 }
 function render_selected_user(user_data) {
     var context;
-    if(user_data === undefined) {
+    if(user_data === undefined || user_data === null) {
         context = {placeholder: true};  // dummy card
     } else {
         user_data = update_user_with_card_details(user_data);
@@ -63,7 +75,7 @@ function set_toast(message, message_type) {
     _dom.toastWrap.addClass('visible');
     setTimeout(function() {
         _dom.toastWrap.removeClass('visible');
-    }, 4000);
+    }, 5000);
 }
 function set_selected_user(user, update_search_result) {
     selectedUser = user;
@@ -230,42 +242,58 @@ $(document).ready(function(){
     };
     var urls = {
         insideUserApi: '/inside/user/',
-        insidePhoneNumberApi: '/inside/phonenumber/',
-        insideCardNumber: '/inside/cardnumber/',
+        checkPhoneNumber: '/check-phonenumber/',
+        insideCard: '/inside/card/',
         insideRegister: '/inside/register/'
     };
     /* Add filter |phoneNumber */
-    nunjucksEnv.addFilter('phoneNumber', function(str) {
-        if(!str || str.length <= 1) {
-            return 'No phone number';
-        }
-        if(str.length == 11) {
-            return str.slice(0, 3) + " " + str.slice(3, 6) + " " + str.slice(6, 8) + " " + str.slice(8);
-        }
-
-        return str;
-    });
+    nunjucksEnv.addFilter('phoneNumber', format_phone_number);
 
     /* Phone number as you type */
+    function checkPhoneNumber() {
+        var val = _dom.phoneNumberField.val().trim();
+        $.getJSON(urls.checkPhoneNumber, {phone_number: val}, function(data) {
+            if(data.error) {
+                set_selected_user(null, true);
+                set_field_state(_dom.phoneNumberField, 'error', data.error);
+                return;
+            }
+
+            var inside = data.inside;
+            if(inside.users.length == 1) {
+                /* Existing user */
+                set_selected_user(inside.users[0], true);
+                set_field_state(_dom.phoneNumberField, 'success', 'Phone number belongs to existing user.');
+                cardForm.fields.phoneNumber = true;
+            } else if(inside.card && inside.card.has_valid_membership) {
+                var msg = 'Phone number is already tied to card '+ inside.card.card_number + ' and is valid until '+ inside.card.expires +'.';
+                set_field_state(_dom.phoneNumberField, 'error', msg);
+                cardForm.fields.phoneNumber = false;
+            } else {
+                set_selected_user(null, true);
+            }
+
+            var tekstmelding = data.tekstmelding;
+            if(tekstmelding.result !== null) {
+                /* Pending SMS membership (not activated yet) */
+                set_field_state(_dom.phoneNumberField, 'success', 'Phone number has pending membership (paid via SMS).');
+                cardForm.fields.phoneNumber = true;
+            }
+
+            update_submit_button();
+        });
+    }
+
+    var lazyCheckPhoneNumber = _.debounce(checkPhoneNumber, 250);
     _dom.phoneNumberField.on('input', function() {
         var val = _dom.phoneNumberField.val().trim();
         var validation_msg = validatePhoneNumber(val);
         if( validation_msg !== '') {
+            set_selected_user(null, true);
             set_field_state(_dom.phoneNumberField, 'error', validation_msg);
             return;
         }
-        $.getJSON(urls.insidePhoneNumberApi, {q: val}, function(data) {
-            if(data.meta && data.meta.num_results == 1) {
-                set_field_state(_dom.phoneNumberField, 'success');
-                set_selected_user(data.results[0], true);
-            } else {
-                set_field_state(_dom.phoneNumberField, '');
-                set_selected_user(null, true);
-            }
-            cardForm.fields.phoneNumber = true;
-            update_submit_button();
-        });
-
+        lazyCheckPhoneNumber();
     });
     /* Card number as you type */
     _dom.cardNumberField.on('input', function() {
@@ -276,23 +304,28 @@ $(document).ready(function(){
             set_field_state(_dom.cardNumberField, 'error', validation_msg);
             return;
         }
-        $.getJSON(urls.insideCardNumber, {card_number: val}, function(data) {
+        $.getJSON(urls.insideCard, {card_number: val}, function(data) {
             if(data.error) {
                 update_submit_button();
                 cardForm.fields.cardNumber = false;
                 set_field_state(_dom.cardNumberField, 'error', data.error);
                 return;
             }
-            if(!data.valid) {
+            var card = data.card;
+            var user = data.user;
+            if(!card) {
                 cardForm.fields.cardNumber = false;
                 set_field_state(_dom.cardNumberField, 'error', 'Cannot find card number in database.');
             }
-            else if(data.user !== null && data.valid) {
-                var _user = data.user[0];
+            else if(card && card.registered !== null) {
+                var owner_string = 'phone number: '+ format_phone_number(card.owner_phone_number);
+                if(user) {
+                    owner_string = 'existing user: ' + user.firstname + ' ' + user.lastname + ' (' + format_phone_number(user.number) + ')';
+                }
                 cardForm.fields.cardNumber = false;
-                set_field_state(_dom.cardNumberField, 'error', 'Card number is in use and belongs to existing user: '+ _user.firstname +' '+ _user.lastname +' ('+_user.id+').');
+                set_field_state(_dom.cardNumberField, 'error', 'Card number is in use and belongs to '+ owner_string +'.');
             }
-            else if(data.user === null && data.valid) {
+            else if(data.user === null && data.card) {
                 cardForm.fields.cardNumber = true;
                 set_field_state(_dom.cardNumberField, 'success');
             } else {
@@ -352,21 +385,29 @@ $(document).ready(function(){
         e.preventDefault();
         // TODO on error output validation status
         // TODO on success:
-        //  - print what action was performed and suggest steps
+        //  - print suggested steps ("You will now get an sms with a link")
         //  - show new user below form (hide/show after 10s)
         //  - clear form
 
         if( !cardFormIsValid() ) {
-            // ERROR
+            set_toast('Either phone number or card number is not valid', 'error');
             return;
         }
-        var url = urls.insideRegister;
+        var url = urls.insideCard;
         var payload = getFormData(_dom.registerCardForm);
 
-        /* Just updating card number? */
-        if(payload.user_id && payload.card_number && selectedUser.is_member === "1") {
-            url = urls.insideCardNumber;
+        /* Register type */
+        // FIXME: get from form
+        if(selectedUser === null) {
+            payload.type = 'new_card_only';
+        } else {
+            if(selectedUser.is_member === '1') {
+                payload.type = 'renewal';
+            } else {
+                payload.type = 'new_user';
+            }
         }
+
         $.ajax(url, {
             data: JSON.stringify(payload),
             contentType: 'application/json',
@@ -379,18 +420,18 @@ $(document).ready(function(){
 
         }).fail(function(data) {
             console.log("failed", data);
-            set_toast('Failed!'+ data.error, 'error');
+            var error_text = data.responseText;
+            if(data.responseJSON) {
+                error_text = data.responseJSON.error;
+            }
+            set_toast('Failed! '+ error_text, 'error');
         });
     });
 
     /* On user id change */
     _dom.userIdField.on('change', function() {
         /* Render selected user in search form */
-        if(selectedUser) {
-            render_selected_user(selectedUser);
-            return;
-        }
-        render_selected_user();
+        render_selected_user(selectedUser);
     });
     /* Reset buttons */
     _dom.registerResetButton.on('click', function() {

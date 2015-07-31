@@ -19,8 +19,9 @@
             </div>
             {{ add_card_form|bootstrap }}
             <ul>
+                <li>If no existing membership can be found, a new membership is registered.</li>
+                <li>If an existing user is found, the membership is marked as renewed</li>
                 <li>Registering a card number with a phone number already tied to an existing user, will add the card to that user.</li>
-                <li>If no existing membership can be found, a new membership is registered (or renewed).</li>
             </ul>
             <button id="register-submit-btn" type="submit" class="btn btn-primary btn-lg" disabled>{% trans "Register card" %}</button>
             <button type="reset" class="register-reset-btn btn btn-default">{% trans "Reset" %}</button>

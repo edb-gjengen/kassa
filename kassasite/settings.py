@@ -119,6 +119,9 @@ LOGIN_REDIRECT_URL = '/'
 INSIDE_API_KEY = ''
 INSIDE_API_URL = 'https://inside.studentersamfundet.no/api/'
 
+TEKSTMELDING_API_KEY = ''
+TEKSTMELDING_API_URL = 'https://tekstmelding.neuf.no/'
+
 # Local settings
 try:
     from local_settings import *

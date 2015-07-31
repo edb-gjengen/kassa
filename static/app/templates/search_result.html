@@ -17,9 +17,9 @@
         {% endif %}
         <!-- Card -->
         {% if res.card_number_active and res.card_is_legacy != '' %}
-            <span class="label label-card label-card-yes"><span class="glyphicon glyphicon-ok"></span> {{ res.card_number_active }}</span>
+            <span class="label label-card label-card-yes"><span class="card-icon"></span> {{ res.card_number_active }}</span>
         {% else %}
-            <span class="label label-card label-card-no"><span class="glyphicon glyphicon-remove"></span> No card</span>
+            <span class="label label-card label-card-no"><span class="card-icon"></span> No card</span>
         {% endif %}
         <!-- Is active -->
         {% if res.is_active == "1" %}
@@ -52,7 +52,7 @@
         </div>
         <div class="phone-number"><span class="glyphicon glyphicon-phone"></span> {{ number|phoneNumber }}</div>
         <div class="labels">
-            <span class="label label-card">New card</span>
+            <span class="label label-card"><span class="card-icon"></span> New card</span>
         </div>
     </div>
 {% endif %}

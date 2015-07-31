@@ -54,13 +54,13 @@ output += "</span>\n        ";
 }
 output += "\n        <!-- Card -->\n        ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_number_active", env.opts.autoescape) && runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_is_legacy", env.opts.autoescape) != "") {
-output += "\n            <span class=\"label label-card label-card-yes\"><span class=\"glyphicon glyphicon-ok\"></span> ";
+output += "\n            <span class=\"label label-card label-card-yes\"><span class=\"card-icon\"></span> ";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"card_number_active", env.opts.autoescape), env.opts.autoescape);
 output += "</span>\n        ";
 ;
 }
 else {
-output += "\n            <span class=\"label label-card label-card-no\"><span class=\"glyphicon glyphicon-remove\"></span> No card</span>\n        ";
+output += "\n            <span class=\"label label-card label-card-no\"><span class=\"card-icon\"></span> No card</span>\n        ";
 ;
 }
 output += "\n        <!-- Is active -->\n        ";
@@ -86,7 +86,7 @@ output += "\n    </label>\n";
 else {
 output += "\n    <!-- Placeholder -->\n    <div class=\"list-group-item search-result placeholder\">\n        <div class=\"name\">\n            <input type=\"radio\" name=\"user\" checked>\n            <span class=\"glyphicon glyphicon-user\"></span> <em>New member</em>\n        </div>\n        <div class=\"phone-number\"><span class=\"glyphicon glyphicon-phone\"></span> ";
 output += runtime.suppressValue(env.getFilter("phoneNumber").call(context, runtime.contextOrFrameLookup(context, frame, "number")), env.opts.autoescape);
-output += "</div>\n        <div class=\"labels\">\n            <span class=\"label label-card\">New card</span>\n        </div>\n    </div>\n";
+output += "</div>\n        <div class=\"labels\">\n            <span class=\"label label-card\"><span class=\"card-icon\"></span> New card</span>\n        </div>\n    </div>\n";
 ;
 }
 cb(null, output);
