@@ -270,6 +270,7 @@ $(document).ready(function(){
                 set_field_state(_dom.phoneNumberField, 'error', msg);
                 cardForm.fields.phoneNumber = false;
             } else {
+                set_field_state(_dom.phoneNumberField, 'success', '');
                 set_selected_user(null, true);
             }
 
@@ -317,7 +318,7 @@ $(document).ready(function(){
                 cardForm.fields.cardNumber = false;
                 set_field_state(_dom.cardNumberField, 'error', 'Cannot find card number in database.');
             }
-            else if(card && card.registered !== null) {
+            else if(card && card.registered !== "") {
                 var owner_string = 'phone number: '+ format_phone_number(card.owner_phone_number);
                 if(user) {
                     owner_string = 'existing user: ' + user.firstname + ' ' + user.lastname + ' (' + format_phone_number(user.number) + ')';
@@ -383,11 +384,9 @@ $(document).ready(function(){
 
     _dom.registerSubmitButton.on('click', function(e) {
         e.preventDefault();
-        // TODO on error output validation status
         // TODO on success:
         //  - print suggested steps ("You will now get an sms with a link")
         //  - show new user below form (hide/show after 10s)
-        //  - clear form
 
         if( !cardFormIsValid() ) {
             set_toast('Either phone number or card number is not valid', 'error');
@@ -398,13 +397,14 @@ $(document).ready(function(){
 
         /* Register type */
         // FIXME: get from form
+        // action: 'new_card_no_user', 'update_card', 'renewal'
         if(selectedUser === null) {
-            payload.type = 'new_card_only';
+            payload.action = 'new_card_no_user';
         } else {
             if(selectedUser.is_member === '1') {
-                payload.type = 'renewal';
+                payload.action = 'update_card';
             } else {
-                payload.type = 'new_user';
+                payload.action = 'renewal'; // Not: could also update card number
             }
         }
 

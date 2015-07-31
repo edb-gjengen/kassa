@@ -7,6 +7,7 @@
             {% csrf_token %}
             <h3>{% trans "Register card" %}</h3>
             <p><!--
+                Add no-user membership [DONE].
                 Add membership for new user and existing user.
                 Renew membership for existing user.
                 Register card to existing user [DONE].
@@ -19,8 +20,8 @@
             </div>
             {{ add_card_form|bootstrap }}
             <ul>
-                <li>If no existing membership can be found, a new membership is registered.</li>
-                <li>If an existing user is found, the membership is marked as renewed</li>
+                <li>If <em>no</em> existing user with membership can be found, <strong>a new membership is registered</strong> and tied to a card number.</li>
+                <li>If an existing user is found <em>without</em> a membership, it is <strong>renewed</strong></li>
                 <li>Registering a card number with a phone number already tied to an existing user, will add the card to that user.</li>
             </ul>
             <button id="register-submit-btn" type="submit" class="btn btn-primary btn-lg" disabled>{% trans "Register card" %}</button>

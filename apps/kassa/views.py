@@ -10,6 +10,7 @@ import phonenumbers
 import requests
 
 from apps.kassa.forms import AddCardForm, SearchUserForm
+from apps.kassa.utils import tekstmelding_new_card_no_user
 
 
 @login_required
@@ -63,7 +64,7 @@ def check_phone_number(request):
         'api_key': settings.TEKSTMELDING_API_KEY,
         'number': number
     }
-    url = '{}kassa-pending-membership'.format(settings.TEKSTMELDING_API_URL)
+    url = '{}kassa/pending-membership'.format(settings.TEKSTMELDING_API_URL)
     tekstmelding_data = requests.get(url, params=payload).json()
 
     return JsonResponse({
@@ -85,7 +86,7 @@ def inside_card_api(request):
             'card_number': post_data.get('card_number'),
             'user_id': post_data.get('user_id'),
             'phone_number': post_data.get('phone_number'),
-            'type': post_data.get('type')  # renewal, new_user, new_card_only,
+            'action': post_data.get('action')  # new_card_no_user, update_card, renewal
         }
         response = requests.post(
             url,
@@ -93,6 +94,12 @@ def inside_card_api(request):
             params=params,
             headers=dict(content_type='application/json')
         )
+        # Send activation notification (link) to user by SMS
+        # FIXME: could be async
+        if response.status_code == 200 and payload['action'] == 'new_card_no_user':
+            card = response.json()['card']
+            # FIXME: ignores errors
+            tekstmelding_new_card_no_user(card_number=card['card_number'], phone_number=card['owner_phone_number'])
     else:
         params.update({
             'card_number': request.GET.get('card_number', '')
