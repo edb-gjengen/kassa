@@ -70,12 +70,12 @@ output += "\n            <span class=\"label label-is-active\">Active</span>\n  
 }
 output += "\n    </div>\n    ";
 if(!runtime.contextOrFrameLookup(context, frame, "no_user_actions")) {
-output += "\n        <div class=\"user-actions\">\n            <div class=\"btn-group\">\n                <a href=\"#\" class=\"btn btn-default";
+output += "\n        <div class=\"user-actions\">\n            <div class=\"btn-group\">\n                <!--<a href=\"#\" class=\"btn btn-default";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"is_member", env.opts.autoescape) == "1") {
 output += " disabled";
 ;
 }
-output += "\">Membership</a>\n                <a href=\"#\" class=\"btn btn-default\">Reg. card</a>\n                <div class=\"btn-group\" role=\"group\">\n                    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n                        <span class=\"glyphicon glyphicon-option-vertical\"></span>\n                    </button>\n                    <ul class=\"dropdown-menu\">\n                        <li><a href=\"https://inside.studentersamfundet.no/index.php?page=display-user&userid=";
+output += "\">Membership</a>\n                <a href=\"#\" class=\"btn btn-default\">Reg. card</a>-->\n                <div class=\"btn-group\" role=\"group\">\n                    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n                        <span class=\"glyphicon glyphicon-option-vertical\"></span>\n                    </button>\n                    <ul class=\"dropdown-menu\">\n                        <li><a href=\"https://inside.studentersamfundet.no/index.php?page=display-user&userid=";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "res")),"id", env.opts.autoescape), env.opts.autoescape);
 output += "\" target=\"_blank\">Edit in Inside</a></li>\n                    </ul>\n              </div>\n            </div>\n        </div>\n    ";
 ;

@@ -81,6 +81,7 @@ def inside_card_api(request):
     }
 
     if request.method == 'POST':
+        # TODO: Move this to own method in utils.py, called by register_card_and_membership
         post_data = json.loads(request.body)
         payload = {
             'card_number': post_data.get('card_number'),
@@ -111,6 +112,7 @@ def inside_card_api(request):
 
 @login_required
 def inside_register_api(request):
+    # TODO: move this to own method in utils.py
     post_data = json.loads(request.body)
     payload = {
         'apikey': settings.INSIDE_API_KEY,
@@ -124,3 +126,9 @@ def inside_register_api(request):
     response = requests.post(url, data=json.dumps(payload), headers=dict(content_type='application/json'))
 
     return JsonResponse(response.json(), status=response.status_code)
+
+
+@login_required()
+def register_card_and_membership(request):
+    # TODO: Call membership and card apis above, depending of what need to be done
+    pass

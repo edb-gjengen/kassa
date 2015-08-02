@@ -11,6 +11,6 @@ class SearchUserForm(forms.Form):
 
 
 class AddCardForm(forms.Form):
-    phone_number = PhoneNumberField(widget=forms.TextInput(attrs={'type': 'tel'}))
     card_number = forms.IntegerField(widget=forms.NumberInput())
+    phone_number = PhoneNumberField(widget=forms.TextInput(attrs={'type': 'tel'}))
     user_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)

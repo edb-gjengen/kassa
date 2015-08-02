@@ -397,14 +397,14 @@ $(document).ready(function(){
 
         /* Register type */
         // FIXME: get from form
-        // action: 'new_card_no_user', 'update_card', 'renewal'
+        // action: 'new_card_no_user', 'update_card', 'add_or_renew'
         if(selectedUser === null) {
             payload.action = 'new_card_no_user';
         } else {
             if(selectedUser.is_member === '1') {
                 payload.action = 'update_card';
             } else {
-                payload.action = 'renewal'; // Not: could also update card number
+                payload.action = 'add_or_renew'; // Note: could also update card number
             }
         }
 

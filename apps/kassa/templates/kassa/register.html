@@ -5,8 +5,9 @@
     <div class="col-sm-5 section-card-form">
         <form class="register-card-form" autocomplete="off">
             {% csrf_token %}
-            <h3>{% trans "Register card" %}</h3>
-            <p><!--
+            <h3>{% trans "Card and membership" %}</h3>
+            <p>Enter card and phone number to register a new membership or add card to an existing user.
+                <!--
                 Add no-user membership [DONE].
                 Add membership for new user and existing user.
                 Renew membership for existing user.
@@ -14,14 +15,13 @@
                 Replace card for existing user [DONE]
                 -->
                 </p>
+            {{ add_card_form|bootstrap }}
             <div class="register-card-form--selected-user-section">
                 <label>{% trans "Member" %}</label>
                 <div class="register-card-form--selected-user-wrap"></div>
             </div>
-            {{ add_card_form|bootstrap }}
             <ul>
-                <li>If <em>no</em> existing user with membership can be found, <strong>a new membership is registered</strong> and tied to a card number.</li>
-                <li>If an existing user is found <em>without</em> a membership, it is <strong>renewed</strong></li>
+                <li>If an existing user is found <em>without</em> a valid membership, the membership is <strong>renewed</strong></li>
                 <li>Registering a card number with a phone number already tied to an existing user, will add the card to that user.</li>
             </ul>
             <button id="register-submit-btn" type="submit" class="btn btn-primary btn-lg" disabled>{% trans "Register card" %}</button>

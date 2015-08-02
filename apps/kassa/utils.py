@@ -13,7 +13,7 @@ def tekstmelding_new_card_no_user(card_number, phone_number):
         'action': 'new_card_no_user',
     }
 
-    url = '{}kassa/notify-new-card'.format(settings.TEKSTMELDING_API_URL)
+    url = '{}kassa/new-membership-card'.format(settings.TEKSTMELDING_API_URL)
     response = requests.post(
         url,
         data=json.dumps(payload),
