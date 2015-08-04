@@ -244,7 +244,7 @@ $(document).ready(function(){
         insideUserApi: '/inside/user/',
         checkPhoneNumber: '/check-phonenumber/',
         insideCard: '/inside/card/',
-        insideRegister: '/inside/register/'
+        registerCardAndMembership: '/register-card-membership/'
     };
     /* Add filter |phoneNumber */
     nunjucksEnv.addFilter('phoneNumber', format_phone_number);
@@ -392,14 +392,13 @@ $(document).ready(function(){
             set_toast('Either phone number or card number is not valid', 'error');
             return;
         }
-        var url = urls.insideCard;
         var payload = getFormData(_dom.registerCardForm);
 
         /* Register type */
         // FIXME: get from form
-        // action: 'new_card_no_user', 'update_card', 'add_or_renew'
+        // action: 'new_card_membership', 'update_card', 'add_or_renew'
         if(selectedUser === null) {
-            payload.action = 'new_card_no_user';
+            payload.action = 'new_card_membership';
         } else {
             if(selectedUser.is_member === '1') {
                 payload.action = 'update_card';
@@ -408,7 +407,7 @@ $(document).ready(function(){
             }
         }
 
-        $.ajax(url, {
+        $.ajax(urls.registerCardAndMembership, {
             data: JSON.stringify(payload),
             contentType: 'application/json',
             dataType: 'json',

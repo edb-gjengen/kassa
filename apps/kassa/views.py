@@ -10,7 +10,8 @@ import phonenumbers
 import requests
 
 from apps.kassa.forms import AddCardForm, SearchUserForm
-from apps.kassa.utils import tekstmelding_new_card_no_user
+from apps.kassa.utils import tekstmelding_new_membership_card, inside_update_card, inside_get_card, \
+    inside_update_membership
 
 
 @login_required
@@ -75,60 +76,40 @@ def check_phone_number(request):
 
 @login_required
 def inside_card_api(request):
-    url = '{}card.php'.format(settings.INSIDE_API_URL)
-    params = {
-        'apikey': settings.INSIDE_API_KEY
-    }
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Only method GET supported'})
 
-    if request.method == 'POST':
-        # TODO: Move this to own method in utils.py, called by register_card_and_membership
-        post_data = json.loads(request.body)
-        payload = {
-            'card_number': post_data.get('card_number'),
-            'user_id': post_data.get('user_id'),
-            'phone_number': post_data.get('phone_number'),
-            'action': post_data.get('action')  # new_card_no_user, update_card, renewal
-        }
-        response = requests.post(
-            url,
-            data=json.dumps(payload),
-            params=params,
-            headers=dict(content_type='application/json')
-        )
-        # Send activation notification (link) to user by SMS
-        # FIXME: could be async
-        if response.status_code == 200 and payload['action'] == 'new_card_no_user':
-            card = response.json()['card']
-            # FIXME: ignores errors
-            tekstmelding_new_card_no_user(card_number=card['card_number'], phone_number=card['owner_phone_number'])
-    else:
-        params.update({
-            'card_number': request.GET.get('card_number', '')
-        })
-        response = requests.get(url, params=params)
-
-    return JsonResponse(response.json(), status=response.status_code)
-
-
-@login_required
-def inside_register_api(request):
-    # TODO: move this to own method in utils.py
-    post_data = json.loads(request.body)
-    payload = {
-        'apikey': settings.INSIDE_API_KEY,
-        'phone': post_data.get('phone_number'),
-        # 'user_id': post_data.get('user_id'),
-        'type': post_data.get('type'),  # 'renewal' or 'new'
-        'card_number': post_data.get('card_number'),
-        'source': 'physical'
-    }
-    url = '{}register.php'.format(settings.INSIDE_API_URL)
-    response = requests.post(url, data=json.dumps(payload), headers=dict(content_type='application/json'))
-
+    response = inside_get_card(request.GET.get('card_number'))
     return JsonResponse(response.json(), status=response.status_code)
 
 
 @login_required()
 def register_card_and_membership(request):
-    # TODO: Call membership and card apis above, depending of what need to be done
-    pass
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only method POST supported'})
+
+    post_data = json.loads(request.body)
+    action = post_data.get('action')  # new_card_membership, update_card, add_or_renew
+    user_id = post_data.get('user_id'),
+
+    response = inside_update_card(
+        post_data.get('card_number'),
+        user_id,
+        post_data.get('phone_number'),
+        action
+    )
+    if response.status_code != 200:
+        return JsonResponse(response.json(), status=response.status_code)
+
+    # Send activation notification (link) to user by SMS
+    if action == 'new_card_membership':
+        card = response.json()['card']
+        # FIXME: could be async
+        tekstmelding_new_membership_card(card_number=card['card_number'], phone_number=card['owner_phone_number'])
+
+    # Add initial or renew membership
+    elif action == 'add_or_renew':
+        response = inside_update_membership(user_id, post_data.get('purchased'))
+
+    return JsonResponse(response.json(), status=response.status_code)
+
