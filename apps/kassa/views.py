@@ -90,7 +90,7 @@ def register_card_and_membership(request):
 
     post_data = json.loads(request.body)
     action = post_data.get('action')  # new_card_membership, update_card, add_or_renew
-    user_id = post_data.get('user_id'),
+    user_id = post_data.get('user_id')
 
     response = inside_update_card(
         post_data.get('card_number'),
@@ -100,6 +100,8 @@ def register_card_and_membership(request):
     )
     if response.status_code != 200:
         return JsonResponse(response.json(), status=response.status_code)
+
+    # card_response = response.json()
 
     # Send activation notification (link) to user by SMS
     if action == 'new_card_membership':

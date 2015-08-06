@@ -36,7 +36,6 @@ def inside_get_card(card_number):
 
 def inside_update_card(card_number, user_id, phone_number, action):
     url = '{}card.php'.format(settings.INSIDE_API_URL)
-    params = {'apikey': settings.INSIDE_API_KEY}
 
     payload = {
         'card_number': card_number,
@@ -47,7 +46,7 @@ def inside_update_card(card_number, user_id, phone_number, action):
     return requests.post(
         url,
         data=json.dumps(payload),
-        params=params,
+        params={'apikey': settings.INSIDE_API_KEY},
         headers=dict(content_type='application/json')
     )
 
