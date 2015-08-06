@@ -256,6 +256,8 @@ $(document).ready(function(){
             if(data.error) {
                 set_selected_user(null, true);
                 set_field_state(_dom.phoneNumberField, 'error', data.error);
+                cardForm.fields.phoneNumber = false;
+                update_submit_button();
                 return;
             }
 
@@ -384,9 +386,6 @@ $(document).ready(function(){
 
     _dom.registerSubmitButton.on('click', function(e) {
         e.preventDefault();
-        // TODO on success:
-        //  - print suggested steps ("You will now get an sms with a link")
-        //  - show new user below form (hide/show after 10s)
 
         if( !cardFormIsValid() ) {
             set_toast('Either phone number or card number is not valid', 'error');
@@ -414,7 +413,16 @@ $(document).ready(function(){
             type: 'post',
             headers: {'X-CSRFToken': getCookie('csrftoken')}
         }).success(function(data){
-            set_toast('Success :-)', 'success');
+            var success_message = 'New card registered ' + payload.card_number;
+            if(payload.action === 'add_or_renew') {
+                var full_name =  data.user[0].firstname + ' ' + data.user[0].lastname;
+                success_message = 'New membership and card number '+ payload.card_number + ' registered to ' + full_name;
+            }
+            else if(payload.action ==='new_card_membership') {
+                var phone_number = data.card.owner_phone_number;
+                success_message = 'New membership and card registered to ' + format_phone_number(phone_number) + '. Activation SMS sent ';
+            }
+            set_toast(success_message + ' :-)', 'success');
             resetCardForm(true);
 
         }).fail(function(data) {
