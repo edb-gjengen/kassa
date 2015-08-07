@@ -253,6 +253,7 @@ $(document).ready(function(){
     function checkPhoneNumber() {
         var val = _dom.phoneNumberField.val().trim();
         $.getJSON(urls.checkPhoneNumber, {phone_number: val}, function(data) {
+            /* Invalid phone number?*/
             if(data.error) {
                 set_selected_user(null, true);
                 set_field_state(_dom.phoneNumberField, 'error', data.error);
@@ -260,29 +261,36 @@ $(document).ready(function(){
                 update_submit_button();
                 return;
             }
-
-            var inside = data.inside;
-            if(inside.users.length == 1) {
-                /* Existing user */
-                set_selected_user(inside.users[0], true);
-                set_field_state(_dom.phoneNumberField, 'success', 'Phone number belongs to existing user.');
-                cardForm.fields.phoneNumber = true;
-            } else if(inside.card && inside.card.has_valid_membership) {
-                var msg = 'Phone number is already tied to card '+ inside.card.card_number + ' and is valid until '+ inside.card.expires +'.';
+            /* Already has valid card membership? */
+            if(data.inside.card && data.inside.card.has_valid_membership) {
+                var card = data.inside.card;
+                var msg = 'Phone number is already tied to card '+ card.card_number + ' and is valid until '+ card.expires +'.';
                 set_field_state(_dom.phoneNumberField, 'error', msg);
                 cardForm.fields.phoneNumber = false;
-            } else {
-                set_field_state(_dom.phoneNumberField, 'success', '');
-                set_selected_user(null, true);
+                update_submit_button();
+                return;
             }
 
+            var inside = data.inside;
             var tekstmelding = data.tekstmelding;
-            if(tekstmelding.result !== null) {
+            var _user = null;
+            var _success_msg = '';
+
+            if(inside.users.length == 1) {
+                /* Existing user */
+                _user = inside.users[0];
+                _success_msg = 'Phone number belongs to existing user.';
+            } else if(tekstmelding.result !== null) {
                 /* Pending SMS membership (not activated yet) */
-                set_field_state(_dom.phoneNumberField, 'success', 'Phone number has pending membership (paid via SMS).');
-                cardForm.fields.phoneNumber = true;
+                _success_msg = 'Phone number has pending membership (paid via SMS).';
+                // TODO store this in form and use in confirmation message.
+            } else {
+                /* Valid phone number with no existing user, card membership or pending SMS membership */
             }
 
+            set_field_state(_dom.phoneNumberField, 'success', _success_msg);
+            set_selected_user(_user, true);
+            cardForm.fields.phoneNumber = true;
             update_submit_button();
         });
     }
@@ -420,7 +428,8 @@ $(document).ready(function(){
             }
             else if(payload.action ==='new_card_membership') {
                 var phone_number = data.card.owner_phone_number;
-                success_message = 'New membership and card registered to ' + format_phone_number(phone_number) + '. Activation SMS sent ';
+                // TODO Is membership charged by kassa-user or by SMS?
+                success_message = 'New card registered to ' + format_phone_number(phone_number) + '. Activation SMS sent ';
             }
             set_toast(success_message + ' :-)', 'success');
             resetCardForm(true);
