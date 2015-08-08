@@ -23,9 +23,6 @@ function getParameterByName(name) {
 function update_user_with_card_details(user) {
     /* Cards with a number lower than this is legacy as of 2015-08 */
     var legacy_card_limit = 100000000;
-    if(user.cards === '') {
-        return user;
-    }
 
     for(var j=0; j<user.cards.length; j++) {
         if(parseInt(user.cards[j].card_number, 10) < legacy_card_limit) {
