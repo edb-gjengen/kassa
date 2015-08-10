@@ -1,6 +1,7 @@
 Django>=1.8,<1.9
 django-auth-ldap==1.2.6
 django-bootstrap-form==3.2
+django-cors-headers==1.1.0
 django-extensions==1.5.5
 django-phonenumber-field==0.7.2
 gunicorn==17.5

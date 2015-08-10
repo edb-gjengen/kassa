@@ -37,7 +37,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'bootstrapform',
-    'django_extensions'
+    'django_extensions',
+    'corsheaders',
 
 )
 
@@ -47,6 +48,7 @@ INSTALLED_APPS += LOCAL_APPS
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -121,6 +123,8 @@ INSIDE_API_URL = 'https://inside.studentersamfundet.no/api/'
 
 TEKSTMELDING_API_KEY = ''
 TEKSTMELDING_API_URL = 'https://tekstmelding.neuf.no/'
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Local settings
 try:
