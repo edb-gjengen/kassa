@@ -279,7 +279,7 @@ $(document).ready(function(){
                 _success_msg = 'Phone number belongs to existing user.';
             } else if(tekstmelding.result !== null) {
                 /* Pending SMS membership (not activated yet) */
-                _success_msg = 'Phone number has pending membership (paid via SMS).';
+                _success_msg = 'Phone number has valid membership (paid via SMS). OK to give out card.';
                 // TODO store this in form and use in confirmation message.
             } else {
                 /* Valid phone number with no existing user, card membership or pending SMS membership */
