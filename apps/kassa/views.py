@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import unicode_literals
+from itertools import groupby
 import json
 from apps.kassa.models import KassaEvent
 
@@ -142,3 +143,13 @@ def register_card_and_membership(request):
 
     return JsonResponse(response.json(), status=response.status_code)
 
+
+def stats_card_sales(request):
+    sale_events = [KassaEvent.ADD_OR_RENEW, KassaEvent.NEW_CARD_MEMBERSHIP]
+    # TODO filter by start HTTP param
+    events = KassaEvent.objects.filter(event__in=sale_events).values_list('created')
+    grouped = []
+    for key, values in groupby(events, key=lambda row: row[0].date()):
+        grouped.append({'date': key.isoformat(), 'sales': len(list(values))})
+
+    return JsonResponse({'memberships': grouped})
