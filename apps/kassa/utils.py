@@ -57,6 +57,6 @@ def inside_update_membership(user_id, purchased=None):
         'apikey': settings.INSIDE_API_KEY,
         'user_id': user_id,
         'purchased': purchased,
-        'source': 'card'
+        'source': 'kassa'
     }
     return requests.post(url, data=json.dumps(payload), headers=dict(content_type='application/json'))
