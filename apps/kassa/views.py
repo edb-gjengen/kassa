@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import unicode_literals
 import json
+from apps.kassa.models import KassaEvent
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -90,6 +91,7 @@ def register_card_and_membership(request):
 
     post_data = json.loads(request.body)
     action = post_data.get('action')  # new_card_membership, update_card, add_or_renew
+    # TODO: multiple actions (to allow renewal only)
     user_id = post_data.get('user_id')
 
     response = inside_update_card(
@@ -101,6 +103,13 @@ def register_card_and_membership(request):
     if response.status_code != 200:
         return JsonResponse(response.json(), status=response.status_code)
 
+    KassaEvent.objects.create(
+        event=KassaEvent.UPDATE_CARD,
+        user_inside_id=user_id,
+        user_phone_number=post_data.get('phone_number'),
+        card_number=post_data.get('card_number')
+    )
+
     # card_response = response.json()
 
     # Send activation notification (link) to user by SMS
@@ -108,10 +117,19 @@ def register_card_and_membership(request):
         card = response.json()['card']
         # FIXME: could be async
         tekstmelding_new_membership_card(card_number=card['card_number'], phone_number=card['owner_phone_number'])
+        KassaEvent.objects.create(
+            event=KassaEvent.NEW_CARD_MEMBERSHIP,
+            card_number=card['card_number'],
+            user_phone_number=card['owner_phone_number']
+        )
 
     # Add initial or renew membership
     elif action == 'add_or_renew':
         response = inside_update_membership(user_id, post_data.get('purchased'))
+        KassaEvent.objects.create(
+            event=KassaEvent.ADD_OR_RENEW,
+            user_inside_id=user_id
+        )
 
     return JsonResponse(response.json(), status=response.status_code)
 
