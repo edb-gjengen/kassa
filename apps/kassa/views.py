@@ -9,10 +9,13 @@ from django.http import JsonResponse
 from django.shortcuts import render
 import phonenumbers
 import requests
+import logging
 
 from apps.kassa.forms import AddCardForm, SearchUserForm
 from apps.kassa.utils import tekstmelding_new_membership_card, inside_update_card, inside_get_card, \
     inside_update_membership
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -93,9 +96,10 @@ def register_card_and_membership(request):
     action = post_data.get('action')  # new_card_membership, update_card, add_or_renew
     # TODO: multiple actions (to allow renewal only)
     user_id = post_data.get('user_id')
+    card_number = post_data.get('card_number')
 
     response = inside_update_card(
-        post_data.get('card_number'),
+        card_number,
         user_id,
         post_data.get('phone_number'),
         action
@@ -103,12 +107,17 @@ def register_card_and_membership(request):
     if response.status_code != 200:
         return JsonResponse(response.json(), status=response.status_code)
 
-    KassaEvent.objects.create(
-        event=KassaEvent.UPDATE_CARD,
-        user_inside_id=user_id,
-        user_phone_number=post_data.get('phone_number'),
-        card_number=post_data.get('card_number')
-    )
+    event_data = {
+        'event': KassaEvent.UPDATE_CARD,
+        'user_phone_number': post_data.get('phone_number'),
+        'card_number': card_number
+    }
+    if user_id:
+        event_data.update({'user_inside_id': user_id})
+
+    logger.debug(event_data)
+
+    KassaEvent.objects.create(**event_data)
 
     # card_response = response.json()
 
