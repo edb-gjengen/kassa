@@ -12,9 +12,9 @@ class KassaEvent(models.Model):
         (UPDATE_CARD, _('Updated user card number')),
         (ADD_OR_RENEW, _('Added or renewed membership user membership')),
     )
-    event = models.TextField(max_length=255, choices=EVENT_CHOICES)
+    event = models.CharField(max_length=255, choices=EVENT_CHOICES)
     card_number = models.IntegerField(null=True, blank=True)
     user_inside_id = models.IntegerField(null=True, blank=True)
-    user_phone_number = models.TextField(max_length=100, null=True, blank=True)
+    user_phone_number = models.CharField(max_length=100, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
