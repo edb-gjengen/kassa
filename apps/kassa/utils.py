@@ -42,7 +42,7 @@ def inside_update_card(card_number, user_id, phone_number, action):
         'card_number': card_number,
         'user_id': user_id,
         'phone_number': phone_number,
-        'action': action  # new_card_membership, update_card, add_or_renew
+        'action': action  # new_card_membership, update_card, add_or_renew, sms_card_notify
     }
     return requests.post(
         url,

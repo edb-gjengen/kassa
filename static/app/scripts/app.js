@@ -138,6 +138,8 @@ function resetCardForm(reset_native) {
     selectedUser = null;
     _dom.userIdField.val('').trigger('change');
 
+    pendingSMSMembership = null;
+
     /* Disable submit button */
     _dom.registerSubmitButton.prop('disabled', true);
 }
@@ -206,6 +208,7 @@ function getFormData(formElement) {
 var _dom;
 var users;
 var selectedUser;
+var pendingSMSMembership;
 var cardForm = {
     fields: {
         cardNumber: false,
@@ -255,6 +258,7 @@ $(document).ready(function(){
                 set_selected_user(null, true);
                 set_field_state(_dom.phoneNumberField, 'error', data.error);
                 cardForm.fields.phoneNumber = false;
+                pendingSMSMembership = null;
                 update_submit_button();
                 return;
             }
@@ -264,6 +268,7 @@ $(document).ready(function(){
                 var msg = 'Phone number is already tied to card '+ card.card_number + ' and is valid until '+ card.expires +'.';
                 set_field_state(_dom.phoneNumberField, 'error', msg);
                 cardForm.fields.phoneNumber = false;
+                pendingSMSMembership = null;
                 update_submit_button();
                 return;
             }
@@ -277,12 +282,14 @@ $(document).ready(function(){
                 /* Existing user */
                 _user = inside.users[0];
                 _success_msg = 'Phone number belongs to existing user.';
+                pendingSMSMembership = null;
             } else if(tekstmelding.result !== null) {
                 /* Pending SMS membership (not activated yet) */
                 _success_msg = 'Phone number has valid membership (paid via SMS). OK to give out card.';
-                // TODO store this in form and use in confirmation message.
+                pendingSMSMembership = tekstmelding.result;
             } else {
                 /* Valid phone number with no existing user, card membership or pending SMS membership */
+                pendingSMSMembership = null;
             }
 
             set_field_state(_dom.phoneNumberField, 'success', _success_msg);
@@ -400,9 +407,11 @@ $(document).ready(function(){
 
         /* Register type */
         // FIXME: get from form
-        // action: 'new_card_membership', 'update_card', 'add_or_renew'
-        if(selectedUser === null) {
+        // action: 'new_card_membership', 'update_card', 'add_or_renew', 'sms_card_notify'
+        if(selectedUser === null && pendingSMSMembership === null) {
             payload.action = 'new_card_membership';
+        } else if(selectedUser === null && pendingSMSMembership !== null) {
+            payload.action = 'sms_card_notify';
         } else {
             if(selectedUser.is_member === '1') {
                 payload.action = 'update_card';
@@ -418,15 +427,19 @@ $(document).ready(function(){
             type: 'post',
             headers: {'X-CSRFToken': getCookie('csrftoken')}
         }).success(function(data){
+            var phone_number;
             var success_message = 'New card registered ' + payload.card_number;
             if(payload.action === 'add_or_renew') {
                 var full_name =  data.user[0].firstname + ' ' + data.user[0].lastname;
-                success_message = 'New membership and card number '+ payload.card_number + ' registered to ' + full_name;
+                success_message = 'New membership and card number '+ payload.card_number + ' registered to ' + full_name + ' ';
             }
             else if(payload.action ==='new_card_membership') {
-                var phone_number = data.card.owner_phone_number;
-                // TODO Is membership charged by kassa-user or by SMS?
-                success_message = 'New card registered to ' + format_phone_number(phone_number) + '. Activation SMS sent ';
+                phone_number = data.card.owner_phone_number;
+                success_message = 'New membership and card registered to ' + format_phone_number(phone_number) + '. Activation SMS sent ';
+            }
+            else if(payload.action === 'sms_card_notify') {
+                phone_number = data.card.owner_phone_number;
+                success_message = 'New card registered to ' + format_phone_number(phone_number) + '. Membership already paid by SMS ('+ pendingSMSMembership.purchase_date +'). Activation SMS sent ';
             }
             set_toast(success_message + ' :-)', 'success');
             resetCardForm(true);

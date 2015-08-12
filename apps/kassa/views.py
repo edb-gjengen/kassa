@@ -95,7 +95,7 @@ def register_card_and_membership(request):
         return JsonResponse({'error': 'Only method POST supported'})
 
     post_data = json.loads(request.body)
-    action = post_data.get('action')  # new_card_membership, update_card, add_or_renew
+    action = post_data.get('action')  # new_card_membership, update_card, add_or_renew, sms_card_notify
     # TODO: multiple actions (to allow renewal only)
     user_id = post_data.get('user_id')
     card_number = post_data.get('card_number')
@@ -121,15 +121,19 @@ def register_card_and_membership(request):
 
     KassaEvent.objects.create(**event_data)
 
-    # card_response = response.json()
+    card_update_response = response.json()
 
     # Send activation notification (link) to user by SMS
-    if action == 'new_card_membership':
-        card = response.json()['card']
+    if action == 'new_card_membership' or action == 'sms_card_notify':
+        card = card_update_response['card']
+        event = KassaEvent.NEW_CARD_MEMBERSHIP
+        if action == 'sms_card_notify':
+            event = KassaEvent.SMS_CARD_NOTIFY
+
         # FIXME: could be async
         tekstmelding_new_membership_card(card_number=card['card_number'], phone_number=card['owner_phone_number'])
         KassaEvent.objects.create(
-            event=KassaEvent.NEW_CARD_MEMBERSHIP,
+            event=event,
             card_number=card['card_number'],
             user_phone_number=card['owner_phone_number']
         )

@@ -5,10 +5,12 @@ from django.utils.translation import ugettext_lazy as _
 
 class KassaEvent(models.Model):
     NEW_CARD_MEMBERSHIP = 'new_card_membership'
+    SMS_CARD_NOTIFY = 'sms_card_notify'
     UPDATE_CARD = 'update_card'
     ADD_OR_RENEW = 'add_or_renew'
     EVENT_CHOICES = (
         (NEW_CARD_MEMBERSHIP, _('Added new card membership (no user yet)')),
+        (SMS_CARD_NOTIFY, _('Notified phone number about activation')),
         (UPDATE_CARD, _('Updated user card number')),
         (ADD_OR_RENEW, _('Added or renewed membership user membership')),
     )
