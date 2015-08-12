@@ -15,7 +15,7 @@ import logging
 
 from apps.kassa.forms import AddCardForm, SearchUserForm
 from apps.kassa.utils import tekstmelding_new_membership_card, inside_update_card, inside_get_card, \
-    inside_update_membership
+    inside_update_membership, format_phone_number
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ def check_phone_number(request):
 
     # Is phone number valid?
     try:
-        p = phonenumbers.parse(number, 'NO')
+        p = phonenumbers.parse(number, region='NO')
         if not phonenumbers.is_valid_number(p):
             return JsonResponse({'error': "Phone number '{}' is invalid.".format(number)})
     except phonenumbers.NumberParseException as e:
@@ -111,7 +111,7 @@ def register_card_and_membership(request):
 
     event_data = {
         'event': KassaEvent.UPDATE_CARD,
-        'user_phone_number': post_data.get('phone_number'),
+        'user_phone_number': format_phone_number(post_data.get('phone_number')),
         'card_number': card_number
     }
     if user_id:
@@ -134,7 +134,7 @@ def register_card_and_membership(request):
             user_phone_number=card['owner_phone_number']
         )
 
-    # Add initial or renew membership
+    # Add initial or renew membership for existing user
     elif action == 'add_or_renew':
         response = inside_update_membership(user_id, post_data.get('purchased'))
         KassaEvent.objects.create(
@@ -149,7 +149,7 @@ def stats_card_sales(request):
     sale_events = [KassaEvent.ADD_OR_RENEW, KassaEvent.NEW_CARD_MEMBERSHIP]
     # TODO filter by start HTTP param
     start_date = date(year=2015, month=8, day=1)
-    events = KassaEvent.objects.filter(event__in=sale_events, created__gt=start_date).values_list('created')
+    events = KassaEvent.objects.filter(event__in=sale_events, created__gte=start_date).values_list('created')
     grouped = []
     for key, values in groupby(events, key=lambda row: row[0].date()):
         grouped.append({'date': key.isoformat(), 'sales': len(list(values))})

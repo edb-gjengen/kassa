@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 import json
+import phonenumbers
 import requests
 
 
@@ -60,3 +61,18 @@ def inside_update_membership(user_id, purchased=None):
         'source': 'kassa'
     }
     return requests.post(url, data=json.dumps(payload), headers=dict(content_type='application/json'))
+
+
+def format_phone_number(number):
+    if len(number) == 0:
+        return number
+
+    try:
+        p = phonenumbers.parse(number, region='NO')
+    except phonenumbers.NumberParseException:
+        return number
+
+    if not phonenumbers.is_valid_number(p):
+        return number
+
+    return phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.E164)
