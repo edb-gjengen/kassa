@@ -2,7 +2,8 @@
 from __future__ import unicode_literals
 from itertools import groupby
 import json
-from datetime import date
+import pytz as pytz
+from django.utils import timezone
 from apps.kassa.models import KassaEvent
 
 from django.conf import settings
@@ -151,11 +152,15 @@ def register_card_and_membership(request):
 
 def stats_card_sales(request):
     sale_events = [KassaEvent.ADD_OR_RENEW, KassaEvent.NEW_CARD_MEMBERSHIP]
+
     # TODO filter by start HTTP param
-    start_date = date(year=2015, month=8, day=1)
+    start_date = timezone.datetime(year=2015, month=8, day=1)
+    start_date = pytz.timezone(timezone.get_current_timezone_name()).localize(start_date)
+
     events = KassaEvent.objects.filter(event__in=sale_events, created__gte=start_date).values_list('created')
     grouped = []
-    for key, values in groupby(events, key=lambda row: row[0].date()):
-        grouped.append({'date': key.isoformat(), 'sales': len(list(values))})
+    date_format = '%Y-%m-%d'
+    for key, values in groupby(events, key=lambda row: row[0].strftime(date_format)):
+        grouped.append({'date': key, 'sales': len(list(values))})
 
     return JsonResponse({'memberships': grouped})
