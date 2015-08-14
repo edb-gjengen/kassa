@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 from itertools import groupby
 import json
-import pytz as pytz
 from django.utils import timezone
 from apps.kassa.models import KassaEvent
 
@@ -155,7 +154,7 @@ def stats_card_sales(request):
 
     # TODO filter by start HTTP param
     start_date = timezone.datetime(year=2015, month=8, day=1)
-    start_date = pytz.timezone(timezone.get_current_timezone_name()).localize(start_date)
+    start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
 
     events = KassaEvent.objects.filter(event__in=sale_events, created__gte=start_date).values_list('created')
     grouped = []
