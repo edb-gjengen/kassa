@@ -157,7 +157,7 @@ def renew_membership(request):
     post_data = json.loads(request.body)
 
     response = inside_update_membership(post_data.get('user_id'), purchased=post_data.get('purchased'))
-
+    # TODO: log event
     return JsonResponse(response.json(), status=response.status_code)
 
 
