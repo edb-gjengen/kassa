@@ -6,15 +6,7 @@
         <form class="register-card-form" autocomplete="off">
             {% csrf_token %}
             <h3>{% trans "Card and membership" %}</h3>
-            <p>Enter card and phone number to register a new membership or add card to an existing user.
-                <!--
-                Add no-user membership [DONE].
-                Add membership for new user and existing user [DONE].
-                Renew membership for existing user [DONE].
-                Register card to existing user [DONE].
-                Replace card for existing user [DONE]
-                -->
-                </p>
+            <p>Enter card and phone number to register a new membership or add card to an existing user.</p>
             {{ add_card_form|bootstrap }}
             <div class="register-card-form--selected-user-section">
                 <label>{% trans "Member" %}</label>
@@ -25,7 +17,11 @@
                 <li>Registering a card number with a phone number already tied to an existing user, will add the card to that user.</li>
             </ul>
             <button id="register-submit-btn" type="submit" class="btn btn-primary btn-lg" disabled>{% trans "Register card" %}</button>
-            <button type="reset" class="register-reset-btn btn btn-default">{% trans "Reset" %}</button>
+            <button type="reset" class="register-reset-btn btn btn-default">{% trans "Reset" %}</button><br><br>
+            <ul>
+                <li>If an existing user is found, you can renew the membership only (up to 30 days before expiry).</li>
+            </ul>
+            <button id="membership-submit-btn" type="submit" class="btn btn-default" disabled>{% trans "Renew membership only" %}</button>
         </form>
     </div>
     <div class="col-sm-7 section-search">

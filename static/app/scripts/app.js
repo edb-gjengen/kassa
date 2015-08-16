@@ -77,9 +77,13 @@ function set_toast(message, message_type) {
 function set_selected_user(user, update_search_result) {
     selectedUser = user;
     var new_val = '';
+
     if(user) {
         new_val = user.id;
     }
+
+    updateMemberShipButton(user);
+
     _dom.userIdField.val(new_val).trigger('change');
     if(update_search_result) {
         var stale_search_result = _dom.results.find('.search-result').removeClass('selected');
@@ -140,8 +144,9 @@ function resetCardForm(reset_native) {
 
     pendingSMSMembership = null;
 
-    /* Disable submit button */
+    /* Disable submit buttons */
     _dom.registerSubmitButton.prop('disabled', true);
+    _dom.membershipSubmitButton.prop('disabled', true);
 }
 function resetSearchForm(reset_native) {
     if(reset_native) {
@@ -162,6 +167,19 @@ function update_submit_button() {
         return;
     }
     _dom.registerSubmitButton.prop('disabled', true);
+}
+function updateMemberShipButton(user) {
+    var today_plus_one_month = moment().subtract(1, 'month').format('YYYY-MM-DD');
+    /* Existing member with upcoming expiry and card */
+    if(user && user.is_member === '1' && user.expires <= today_plus_one_month && user.card_number_active !== '') {
+        _dom.membershipSubmitButton.prop('disabled', false);
+    }
+    /* User with card, but expired membership */
+    else if(user && user.is_member !== '1' && user.card_number_active !== '') {
+        _dom.membershipSubmitButton.prop('disabled', false);
+    } else {
+        _dom.membershipSubmitButton.prop('disabled', true);
+    }
 }
 function validatePhoneNumber(val) {
     if(val.length === 0) {
@@ -204,6 +222,56 @@ function getFormData(formElement) {
     return formData;
 }
 
+/* Phone number as you type */
+function checkPhoneNumber() {
+    var val = _dom.phoneNumberField.val().trim();
+    $.getJSON(urls.checkPhoneNumber, {phone_number: val}, function(data) {
+        /* Invalid phone number?*/
+        if(data.error) {
+            set_selected_user(null, true);
+            set_field_state(_dom.phoneNumberField, 'error', data.error);
+            cardForm.fields.phoneNumber = false;
+            pendingSMSMembership = null;
+            update_submit_button();
+            return;
+        }
+        /* Already has valid card membership? */
+        if(data.inside.card && data.inside.card.has_valid_membership) {
+            var card = data.inside.card;
+            var msg = 'Phone number is already tied to card '+ card.card_number + ' and is valid until '+ card.expires +'.';
+            set_field_state(_dom.phoneNumberField, 'error', msg);
+            cardForm.fields.phoneNumber = false;
+            pendingSMSMembership = null;
+            update_submit_button();
+            return;
+        }
+
+        var inside = data.inside;
+        var tekstmelding = data.tekstmelding;
+        var _user = null;
+        var _success_msg = '';
+
+        if(inside.users.length == 1) {
+            /* Existing user */
+            _user = inside.users[0];
+            _success_msg = 'Phone number belongs to existing user.';
+            pendingSMSMembership = null;
+        } else if(tekstmelding.result !== null) {
+            /* Pending SMS membership (not activated yet) */
+            _success_msg = 'Phone number has valid membership (paid via SMS). OK to give out card.';
+            pendingSMSMembership = tekstmelding.result;
+        } else {
+            /* Valid phone number with no existing user, card membership or pending SMS membership */
+            pendingSMSMembership = null;
+        }
+
+        set_field_state(_dom.phoneNumberField, 'success', _success_msg);
+        set_selected_user(_user, true);
+        cardForm.fields.phoneNumber = true;
+        update_submit_button();
+    });
+}
+
 /* Init and global vars */
 var _dom;
 var users;
@@ -221,6 +289,16 @@ var state_to_icon = {
     error: 'remove'
 };
 var nunjucksEnv = new nunjucks.Environment();
+/* Add filter |phoneNumber */
+nunjucksEnv.addFilter('phoneNumber', format_phone_number);
+
+var urls = {
+    insideUserApi: '/inside/user/',
+    checkPhoneNumber: '/check-phonenumber/',
+    insideCard: '/inside/card/',
+    registerCardAndMembership: '/register-card-membership/',
+    renewMembership: '/renew-membership/'
+};
 
 
 
@@ -238,66 +316,9 @@ $(document).ready(function(){
         selectedUserWrap: $('.register-card-form--selected-user-wrap'),
         toastWrap: $('.toast-wrap'),
         registerResetButton: $('.register-reset-btn'),
-        searchResetButton: $('.search-reset-btn')
+        searchResetButton: $('.search-reset-btn'),
+        membershipSubmitButton: $('#membership-submit-btn')
     };
-    var urls = {
-        insideUserApi: '/inside/user/',
-        checkPhoneNumber: '/check-phonenumber/',
-        insideCard: '/inside/card/',
-        registerCardAndMembership: '/register-card-membership/'
-    };
-    /* Add filter |phoneNumber */
-    nunjucksEnv.addFilter('phoneNumber', format_phone_number);
-
-    /* Phone number as you type */
-    function checkPhoneNumber() {
-        var val = _dom.phoneNumberField.val().trim();
-        $.getJSON(urls.checkPhoneNumber, {phone_number: val}, function(data) {
-            /* Invalid phone number?*/
-            if(data.error) {
-                set_selected_user(null, true);
-                set_field_state(_dom.phoneNumberField, 'error', data.error);
-                cardForm.fields.phoneNumber = false;
-                pendingSMSMembership = null;
-                update_submit_button();
-                return;
-            }
-            /* Already has valid card membership? */
-            if(data.inside.card && data.inside.card.has_valid_membership) {
-                var card = data.inside.card;
-                var msg = 'Phone number is already tied to card '+ card.card_number + ' and is valid until '+ card.expires +'.';
-                set_field_state(_dom.phoneNumberField, 'error', msg);
-                cardForm.fields.phoneNumber = false;
-                pendingSMSMembership = null;
-                update_submit_button();
-                return;
-            }
-
-            var inside = data.inside;
-            var tekstmelding = data.tekstmelding;
-            var _user = null;
-            var _success_msg = '';
-
-            if(inside.users.length == 1) {
-                /* Existing user */
-                _user = inside.users[0];
-                _success_msg = 'Phone number belongs to existing user.';
-                pendingSMSMembership = null;
-            } else if(tekstmelding.result !== null) {
-                /* Pending SMS membership (not activated yet) */
-                _success_msg = 'Phone number has valid membership (paid via SMS). OK to give out card.';
-                pendingSMSMembership = tekstmelding.result;
-            } else {
-                /* Valid phone number with no existing user, card membership or pending SMS membership */
-                pendingSMSMembership = null;
-            }
-
-            set_field_state(_dom.phoneNumberField, 'success', _success_msg);
-            set_selected_user(_user, true);
-            cardForm.fields.phoneNumber = true;
-            update_submit_button();
-        });
-    }
 
     var lazyCheckPhoneNumber = _.debounce(checkPhoneNumber, 250);
     _dom.phoneNumberField.on('input', function() {
@@ -395,7 +416,7 @@ $(document).ready(function(){
         }
         _dom.phoneNumberField.val(number).trigger('input');
     });
-
+    /* On submit button click */
     _dom.registerSubmitButton.on('click', function(e) {
         e.preventDefault();
 
@@ -412,6 +433,7 @@ $(document).ready(function(){
             payload.action = 'new_card_membership';
         } else if(selectedUser === null && pendingSMSMembership !== null) {
             payload.action = 'sms_card_notify';
+            payload.purchased = pendingSMSMembership.purchase_date;
         } else {
             if(selectedUser.is_member === '1') {
                 payload.action = 'update_card';
@@ -454,6 +476,43 @@ $(document).ready(function(){
         });
     });
 
+    /* Membership renewal button */
+    _dom.membershipSubmitButton.on('click', function(e) {
+        e.preventDefault();
+        if(!cardForm.fields.phoneNumber || selectedUser.card_number_active === '') {
+            set_toast('Either users phone number is not valid or user does not have a card registered.', 'error');
+            return;
+        }
+
+        var payload = getFormData(_dom.registerCardForm);
+        if( pendingSMSMembership !== null) {
+            payload.purchased = pendingSMSMembership.purchase_date;
+        } else {
+            payload.purchased = selectedUser.expires; // future purchase date
+        }
+        console.log(payload);
+        $.ajax(urls.renewMembership, {
+            data: JSON.stringify(payload),
+            contentType: 'application/json',
+            dataType: 'json',
+            type: 'post',
+            headers: {'X-CSRFToken': getCookie('csrftoken')}
+        }).success(function(data) {
+            var full_name =  data.user[0].firstname + ' ' + data.user[0].lastname;
+            var success_message = 'Membership renewed for ' + full_name + ' ';
+            set_toast(success_message + ' :-)', 'success');
+            resetCardForm(true);
+
+        }).fail(function(data) {
+            console.log("failed", data);
+            var error_text = data.responseText;
+            if(data.responseJSON) {
+                error_text = data.responseJSON.error;
+            }
+            set_toast('Failed! '+ error_text, 'error');
+        });
+    });
+
     /* On user id change */
     _dom.userIdField.on('change', function() {
         /* Render selected user in search form */
@@ -480,19 +539,15 @@ $(document).ready(function(){
     if(_dom.usernameField) {
         _dom.usernameField.focus();
     }
-    if(_dom.phoneNumberField) {
-        _dom.phoneNumberField.focus();
-    }
 
     /* Load query params */
-    /* FIXME: does not trigger validation and selected user preview */
     if( getParameterByName('user_id') ) {
         _dom.userIdField.val(getParameterByName('user_id')).trigger('change');
     }
     if( getParameterByName('phone_number') ) {
-        _dom.phoneNumberField.val(getParameterByName('phone_number'));
+        _dom.phoneNumberField.val(getParameterByName('phone_number')).trigger('input');
     }
     if( getParameterByName('card_number') ) {
-        _dom.cardNumberField.val(getParameterByName('card_number'));
+        _dom.cardNumberField.val(getParameterByName('card_number')).trigger('input');
     }
 });

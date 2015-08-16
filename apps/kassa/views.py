@@ -149,6 +149,18 @@ def register_card_and_membership(request):
     return JsonResponse(response.json(), status=response.status_code)
 
 
+@login_required()
+def renew_membership(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only method POST supported'})
+
+    post_data = json.loads(request.body)
+
+    response = inside_update_membership(post_data.get('user_id'), purchased=post_data.get('purchased'))
+
+    return JsonResponse(response.json(), status=response.status_code)
+
+
 def stats_card_sales(request):
     sale_events = [KassaEvent.ADD_OR_RENEW, KassaEvent.NEW_CARD_MEMBERSHIP]
 
