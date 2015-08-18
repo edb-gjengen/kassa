@@ -155,14 +155,19 @@ def renew_membership(request):
         return JsonResponse({'error': 'Only method POST supported'})
 
     post_data = json.loads(request.body)
+    user_id = post_data.get('user_id')
 
-    response = inside_update_membership(post_data.get('user_id'), purchased=post_data.get('purchased'))
-    # TODO: log event
+    response = inside_update_membership(user_id, purchased=post_data.get('purchased'))
+    KassaEvent.objects.create(
+        event=KassaEvent.RENEW_ONLY,
+        user_inside_id=user_id
+    )
+
     return JsonResponse(response.json(), status=response.status_code)
 
 
 def stats_card_sales(request):
-    sale_events = [KassaEvent.ADD_OR_RENEW, KassaEvent.NEW_CARD_MEMBERSHIP]
+    sale_events = [KassaEvent.ADD_OR_RENEW, KassaEvent.NEW_CARD_MEMBERSHIP, KassaEvent.RENEW_ONLY]
 
     # TODO filter by start HTTP param
     start_date = timezone.datetime(year=2015, month=8, day=1)

@@ -169,7 +169,7 @@ function update_submit_button() {
     _dom.registerSubmitButton.prop('disabled', true);
 }
 function updateMemberShipButton(user) {
-    var today_plus_one_month = moment().subtract(1, 'month').format('YYYY-MM-DD');
+    var today_plus_one_month = moment().add(1, 'month').format('YYYY-MM-DD');
     /* Existing member with upcoming expiry and card */
     if(user && user.is_member === '1' && user.expires <= today_plus_one_month && user.card_number_active !== '') {
         _dom.membershipSubmitButton.prop('disabled', false);
