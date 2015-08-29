@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='kassaevent',
             name='event',
-            field=models.CharField(max_length=255, choices=[('new_card_membership', 'Added new card membership (no user yet)'), ('sms_card_notify', 'Notified phone number about activation'), ('update_card', 'Updated user card number'), ('add_or_renew', 'Added or renewed user membership'), ('renew_only', 'Renewed user membership')]),
+            field=models.CharField(max_length=255, choices=[('new_card_membership', 'Added new card membership (no user yet)'), ('sms_card_notify', 'Notified phone number about activation'), ('update_card', 'Updated user card number'), ('add_or_renew', 'Added or renewed membership user membership'), ('refund', 'Refunded membership')]),
         ),
     ]

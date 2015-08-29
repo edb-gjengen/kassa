@@ -4,17 +4,19 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class KassaEvent(models.Model):
+    ADD_OR_RENEW = 'add_or_renew'
     NEW_CARD_MEMBERSHIP = 'new_card_membership'
+    REFUND = 'refund'
+    RENEW_ONLY = 'renew_only'
     SMS_CARD_NOTIFY = 'sms_card_notify'
     UPDATE_CARD = 'update_card'
-    ADD_OR_RENEW = 'add_or_renew'
-    RENEW_ONLY = 'renew_only'
     EVENT_CHOICES = (
+        (ADD_OR_RENEW, _('Added or renewed user membership')),
         (NEW_CARD_MEMBERSHIP, _('Added new card membership (no user yet)')),
+        (REFUND, _('Refunded membership')),
+        (RENEW_ONLY, _('Renewed user membership')),
         (SMS_CARD_NOTIFY, _('Notified phone number about activation')),
         (UPDATE_CARD, _('Updated user card number')),
-        (ADD_OR_RENEW, _('Added or renewed user membership')),
-        (RENEW_ONLY, _('Renewed user membership')),
     )
     event = models.CharField(max_length=255, choices=EVENT_CHOICES)
     card_number = models.IntegerField(null=True, blank=True)
