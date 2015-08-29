@@ -1,17 +1,8 @@
-## TODO
-* lookup sms-tables in inside
-* register membership in inside-table din_phonenumber, din_usedmembercard, din_user
-* Inside auth
+Kassa helps you register purchased membership cards and memberships. It's a tool for volunteers and bar employees at The Norwegian Student Society.
 
-### Form
-* tlf field
-    * validates in javascript with phonenumber-package
-    * onkeyup could shows matching user data from inside (name, expires)
-* submit button
-    * change text to "... and renew" if existing member
-    * grey if form invalid
-    * blue if form valid
-    * grey out on submit
+## TODO
+* Loading state on submit buttons
+* Inside auth
 
 ## Installation
     apt install libldap2-dev # reqs
