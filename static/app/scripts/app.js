@@ -553,4 +553,9 @@ $(document).ready(function(){
     if( getParameterByName('card_number') ) {
         _dom.cardNumberField.val(getParameterByName('card_number')).trigger('input');
     }
+
+    $('[data-toggle="popover"]').popover({
+        html: true,
+        trigger: 'click'
+    });
 });

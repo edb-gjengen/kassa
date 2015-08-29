@@ -31,6 +31,9 @@ input[type=number] {
 .label-card-no .card-icon {
   background-color: $red-color;
 }
+[data-toggle="popover"] {
+  font-size: 1.4em;
+}
 
 /* Helpers */
 .center-block {

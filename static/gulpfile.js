@@ -34,7 +34,6 @@ gulp.task('diststyles', function () {
 });
 
 gulp.task('vendorscripts', function () {
-    //console.log(vendor_scripts);
     return gulp.src(bowerFiles())
         .pipe($.filter('**/*.js'))
         //.pipe($.uglify())
