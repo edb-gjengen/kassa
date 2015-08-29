@@ -71,6 +71,17 @@ input[type=number] {
   min-height: 78px;
   margin-bottom: 10px;
 }
+.register-reset-btn {
+  margin-left: 10px;
+}
+#id_membership_trial {
+  transform: scale(1.5);
+  margin-left: 10px;
+}
+[for=id_membership_trial] {
+  padding-left: 6px;
+
+}
 
 .query-form {
   margin-bottom: 20px;
