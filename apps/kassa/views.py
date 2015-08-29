@@ -15,7 +15,7 @@ import logging
 
 from apps.kassa.forms import AddCardForm, SearchUserForm
 from apps.kassa.utils import tekstmelding_new_membership_card, inside_update_card, inside_get_card, \
-    inside_update_membership, format_phone_number
+    inside_update_membership, format_phone_number, is_autumn
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,8 @@ logger = logging.getLogger(__name__)
 def register(request):
     context = {
         'add_card_form': AddCardForm(),
-        'search_user_form': SearchUserForm()
+        'search_user_form': SearchUserForm(),
+        'show_trial_membership': is_autumn()
     }
     return render(request, 'kassa/register.html', context)
 
@@ -99,12 +100,14 @@ def register_card_and_membership(request):
     # TODO: multiple actions (to allow renewal only)
     user_id = post_data.get('user_id')
     card_number = post_data.get('card_number')
+    membership_trial = post_data.get('membership_trial')
 
     response = inside_update_card(
         card_number,
         user_id,
         post_data.get('phone_number'),
-        action
+        action,
+        membership_trial
     )
     if response.status_code != 200:
         return JsonResponse(response.json(), status=response.status_code)
@@ -129,6 +132,8 @@ def register_card_and_membership(request):
         event = KassaEvent.NEW_CARD_MEMBERSHIP
         if action == 'sms_card_notify':
             event = KassaEvent.SMS_CARD_NOTIFY
+        elif event == KassaEvent.NEW_CARD_MEMBERSHIP and membership_trial is not None:
+            event = KassaEvent.MEMBERSHIP_TRIAL
 
         # FIXME: could be async
         tekstmelding_new_membership_card(card_number=card['card_number'], phone_number=card['owner_phone_number'])
@@ -140,9 +145,9 @@ def register_card_and_membership(request):
 
     # Add initial or renew membership for existing user
     elif action == 'add_or_renew':
-        response = inside_update_membership(user_id, post_data.get('purchased'))
+        response = inside_update_membership(user_id, post_data.get('purchased'), membership_trial=membership_trial)
         KassaEvent.objects.create(
-            event=KassaEvent.ADD_OR_RENEW,
+            event=KassaEvent.ADD_OR_RENEW if membership_trial is None else KassaEvent.MEMBERSHIP_TRIAL,
             user_inside_id=user_id
         )
 

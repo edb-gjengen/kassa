@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+import datetime
 import json
 import phonenumbers
 import requests
@@ -35,7 +36,7 @@ def inside_get_card(card_number):
     return requests.get(url, params=params)
 
 
-def inside_update_card(card_number, user_id, phone_number, action):
+def inside_update_card(card_number, user_id, phone_number, action, membership_trial=None):
     url = '{}card.php'.format(settings.INSIDE_API_URL)
 
     payload = {
@@ -44,6 +45,9 @@ def inside_update_card(card_number, user_id, phone_number, action):
         'phone_number': phone_number,
         'action': action  # new_card_membership, update_card, add_or_renew, sms_card_notify
     }
+    if membership_trial is not None:
+        payload.update({'membership_trial': membership_trial})
+
     return requests.post(
         url,
         data=json.dumps(payload),
@@ -52,7 +56,7 @@ def inside_update_card(card_number, user_id, phone_number, action):
     )
 
 
-def inside_update_membership(user_id, purchased=None):
+def inside_update_membership(user_id, purchased=None, membership_trial=None):
     url = '{}membership.php'.format(settings.INSIDE_API_URL)
     payload = {
         'apikey': settings.INSIDE_API_KEY,
@@ -60,6 +64,9 @@ def inside_update_membership(user_id, purchased=None):
         'purchased': purchased,
         'source': 'kassa'
     }
+    if membership_trial is not None:
+        payload.update({'membership_trial': membership_trial})
+
     return requests.post(url, data=json.dumps(payload), headers=dict(content_type='application/json'))
 
 
@@ -76,3 +83,10 @@ def format_phone_number(number):
         return number
 
     return phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.E164)
+
+
+def is_autumn():
+    today = datetime.date.today()
+    _min = datetime.date(year=today.year, month=8, day=1)
+    _max = datetime.date(year=today.year + 1, month=1, day=1)
+    return _min <= today < _max

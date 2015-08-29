@@ -142,6 +142,8 @@ function resetCardForm(reset_native) {
     selectedUser = null;
     _dom.userIdField.val('').trigger('change');
 
+    _dom.membershipTrialCheckBox.prop('checked', false);
+
     pendingSMSMembership = null;
 
     /* Disable submit buttons */
@@ -317,7 +319,8 @@ $(document).ready(function(){
         toastWrap: $('.toast-wrap'),
         registerResetButton: $('.register-reset-btn'),
         searchResetButton: $('.search-reset-btn'),
-        membershipSubmitButton: $('#membership-submit-btn')
+        membershipSubmitButton: $('#membership-submit-btn'),
+        membershipTrialCheckBox: $('#id_membership_trial')
     };
 
     var lazyCheckPhoneNumber = _.debounce(checkPhoneNumber, 250);

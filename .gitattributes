@@ -1,0 +1,2 @@
+static/dist/styles/*.css -diff
+static/dist/scripts/*.js -diff
