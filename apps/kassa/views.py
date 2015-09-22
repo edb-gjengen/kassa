@@ -161,10 +161,11 @@ def renew_membership(request):
 
     post_data = json.loads(request.body)
     user_id = post_data.get('user_id')
+    membership_trial = post_data.get('membership_trial')
 
-    response = inside_update_membership(user_id, purchased=post_data.get('purchased'))
+    response = inside_update_membership(user_id, purchased=post_data.get('purchased'), membership_trial=membership_trial)
     KassaEvent.objects.create(
-        event=KassaEvent.RENEW_ONLY,
+        event=KassaEvent.RENEW_ONLY if membership_trial is None else KassaEvent.MEMBERSHIP_TRIAL,
         user_inside_id=user_id
     )
 
