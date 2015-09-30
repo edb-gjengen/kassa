@@ -490,8 +490,9 @@ $(document).ready(function(){
         var payload = getFormData(_dom.registerCardForm);
         if( pendingSMSMembership !== null) {
             payload.purchased = pendingSMSMembership.purchase_date;
-        } else {
-            payload.purchased = selectedUser.expires; // future purchase date
+        }
+        else if( selectedUser.expires && moment(selectedUser.expires) > moment() ) {
+            payload.purchased = selectedUser.expires;  // future purchase date
         }
         console.log(payload);
         $.ajax(urls.renewMembership, {
