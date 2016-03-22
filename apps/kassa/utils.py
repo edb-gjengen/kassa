@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 import datetime
-import json
 import phonenumbers
 import requests
 
@@ -18,7 +17,7 @@ def tekstmelding_new_membership_card(card_number, phone_number):
     url = '{}kassa/new-membership-card'.format(settings.TEKSTMELDING_API_URL)
     response = requests.post(
         url,
-        data=json.dumps(payload),
+        json=payload,
         params={'api_key': settings.TEKSTMELDING_API_KEY},
         headers={'Content-Type': 'application/json'}
     )
@@ -50,7 +49,7 @@ def inside_update_card(card_number, user_id, phone_number, action, membership_tr
 
     return requests.post(
         url,
-        data=json.dumps(payload),
+        json=payload,
         params={'apikey': settings.INSIDE_API_KEY},
         headers=dict(content_type='application/json')
     )
@@ -67,7 +66,7 @@ def inside_update_membership(user_id, purchased=None, membership_trial=None):
     if membership_trial is not None:
         payload.update({'membership_trial': membership_trial})
 
-    return requests.post(url, data=json.dumps(payload), headers=dict(content_type='application/json'))
+    return requests.post(url, json=payload, headers=dict(content_type='application/json'))
 
 
 def format_phone_number(number):
