@@ -95,7 +95,7 @@ def register_card_and_membership(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Only method POST supported'})
 
-    post_data = json.loads(request.body)
+    post_data = json.loads(request.body.decode('utf-8'))
     action = post_data.get('action')  # new_card_membership, update_card, add_or_renew, sms_card_notify
     # TODO: multiple actions (to allow renewal only)
     user_id = post_data.get('user_id')
@@ -159,7 +159,7 @@ def renew_membership(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Only method POST supported'})
 
-    post_data = json.loads(request.body)
+    post_data = json.loads(request.body.decode('utf-8'))
     user_id = post_data.get('user_id')
     membership_trial = post_data.get('membership_trial')
 
