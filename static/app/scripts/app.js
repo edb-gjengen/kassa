@@ -238,7 +238,7 @@ function checkPhoneNumber() {
             return;
         }
         /* Already has valid card membership? */
-        if(data.inside.card && data.inside.card.has_valid_membership) {
+        if(data.inside.card && data.inside.card.has_valid_membership == "1") {
             var card = data.inside.card;
             var msg = 'Phone number is already tied to card '+ card.card_number + ' and is valid until '+ card.expires +'.';
             set_field_state(_dom.phoneNumberField, 'error', msg);
@@ -263,7 +263,7 @@ function checkPhoneNumber() {
             _success_msg = 'Phone number has valid membership (paid via SMS). OK to give out card.';
             pendingSMSMembership = tekstmelding.result;
         } else {
-            /* Valid phone number with no existing user, card membership or pending SMS membership */
+            /* Valid phone number with no existing user, card membership or expired SMS membership */
             pendingSMSMembership = null;
         }
 
@@ -356,6 +356,11 @@ $(document).ready(function(){
                 cardForm.fields.cardNumber = false;
                 set_field_state(_dom.cardNumberField, 'error', 'Cannot find card number in database.');
             }
+            else if(card && card.registered !== "" && user === null && moment(card.expires) <= moment()) {
+                /* An allready registered card (with no user) can repurchase membership if expired */
+                cardForm.fields.cardNumber = true;
+                set_field_state(_dom.cardNumberField, 'success');
+            }
             else if(card && card.registered !== "") {
                 var owner_string = 'phone number: '+ format_phone_number(card.owner_phone_number);
                 if(user) {
@@ -364,7 +369,7 @@ $(document).ready(function(){
                 cardForm.fields.cardNumber = false;
                 set_field_state(_dom.cardNumberField, 'error', 'Card number is in use and belongs to '+ owner_string +'.');
             }
-            else if(data.user === null && data.card) {
+            else if(card && user === null) {
                 cardForm.fields.cardNumber = true;
                 set_field_state(_dom.cardNumberField, 'success');
             } else {
@@ -383,7 +388,6 @@ $(document).ready(function(){
             return;
         }
         $.getJSON(urls.insideUserApi, {q: val}, function(data) {
-            console.log(data);
             if(data.results && data.results.length > 0) {
                 _dom.results.html(format_results(data.results));
                 users = data.results;
@@ -444,7 +448,6 @@ $(document).ready(function(){
                 payload.action = 'add_or_renew'; // Note: could also update card number
             }
         }
-
         $.ajax(urls.registerCardAndMembership, {
             data: JSON.stringify(payload),
             contentType: 'application/json',
@@ -494,7 +497,6 @@ $(document).ready(function(){
         else if( selectedUser.expires && moment(selectedUser.expires) > moment() ) {
             payload.purchased = selectedUser.expires;  // future purchase date
         }
-        console.log(payload);
         $.ajax(urls.renewMembership, {
             data: JSON.stringify(payload),
             contentType: 'application/json',
