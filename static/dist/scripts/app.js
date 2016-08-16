@@ -263,7 +263,7 @@ function checkPhoneNumber() {
             _success_msg = 'Phone number has valid membership (paid via SMS). OK to give out card.';
             pendingSMSMembership = tekstmelding.result;
         } else {
-            /* Valid phone number with no existing user, card membership or expired SMS membership */
+            /* Valid phone number with no existing user, card membership or pending SMS membership */
             pendingSMSMembership = null;
         }
 
