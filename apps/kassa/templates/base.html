@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load staticfiles raven %}
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -12,6 +12,7 @@
     <script src="{% static "dist/scripts/vendor.js" %}"></script>
     <script src="{% static "dist/scripts/templates.js" %}"></script>
     <script src="{% static "dist/scripts/app.js" %}"></script>
+    <script src="https://cdn.ravenjs.com/3.5.1/raven.min.js"></script>
 </head>
 <body>
 <div class="toast-wrap"></div>
@@ -28,5 +29,6 @@
 
     </div>
 </footer>
+    <script>Raven.config('{% sentry_public_dsn %}').install()</script>
 </body>
 </html>

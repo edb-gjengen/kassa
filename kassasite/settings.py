@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
+import raven
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -39,7 +41,7 @@ INSTALLED_APPS = (
     'bootstrapform',
     'django_extensions',
     'corsheaders',
-
+    'raven.contrib.django.raven_compat',
 )
 
 LOCAL_APPS = ('apps.kassa',)
@@ -118,6 +120,11 @@ TEKSTMELDING_API_KEY = ''
 TEKSTMELDING_API_URL = 'https://tekstmelding.neuf.no/'
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+RAVEN_CONFIG = {
+    'dsn': os.getenv('RAVEN_DSN'),
+    'release': raven.fetch_git_sha(BASE_DIR)
+}
 
 # Local settings
 try:
