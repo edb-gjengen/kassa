@@ -361,7 +361,7 @@ $(document).ready(function(){
             else if(card && card.registered !== "" && user === null && moment(card.expires) <= today_plus_one_month) {
                 /* An allready registered card (with no user) can repurchase membership if expired */
                 cardForm.fields.cardNumber = true;
-                set_field_state(_dom.cardNumberField, 'success');
+                set_field_state(_dom.cardNumberField, 'success', 'Card number is in use (not activated) and belongs to ' + format_phone_number(card.owner_phone_number) + '.');
             }
             else if(card && card.registered !== "") {
                 var owner_string = 'phone number: '+ format_phone_number(card.owner_phone_number);
