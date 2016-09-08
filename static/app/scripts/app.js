@@ -352,11 +352,13 @@ $(document).ready(function(){
             }
             var card = data.card;
             var user = data.user;
+            var today_plus_one_month = moment().add(1, 'month');
+
             if(!card) {
                 cardForm.fields.cardNumber = false;
                 set_field_state(_dom.cardNumberField, 'error', 'Cannot find card number in database.');
             }
-            else if(card && card.registered !== "" && user === null && moment(card.expires) <= moment()) {
+            else if(card && card.registered !== "" && user === null && moment(card.expires) <= today_plus_one_month) {
                 /* An allready registered card (with no user) can repurchase membership if expired */
                 cardForm.fields.cardNumber = true;
                 set_field_state(_dom.cardNumberField, 'success');
