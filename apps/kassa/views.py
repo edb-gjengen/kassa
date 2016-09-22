@@ -1,17 +1,16 @@
 # coding: utf-8
-from itertools import groupby
-import json
-from django.utils import timezone
-from apps.kassa.models import KassaEvent
-
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils import timezone
+from itertools import groupby
+import json
+import logging
 import phonenumbers
 import requests
-import logging
 
+from apps.kassa.models import KassaEvent
 from apps.kassa.forms import AddCardForm, SearchUserForm
 from apps.kassa.utils import tekstmelding_new_membership_card, inside_update_card, inside_get_card, \
     inside_update_membership, format_phone_number, is_autumn
@@ -173,10 +172,18 @@ def renew_membership(request):
 
 def stats_card_sales(request):
     sale_events = [KassaEvent.ADD_OR_RENEW, KassaEvent.NEW_CARD_MEMBERSHIP, KassaEvent.RENEW_ONLY]
+    start = request.GET.get('start')
+    if start:
+        try:
+            start_date = timezone.datetime.strptime(start, '%Y-%m-%d')
+        except ValueError:
+            logger.info('Invalid start date in param start: \'%s\'', start)
+            return JsonResponse({'error': 'Invalid start date in param start: \'{}\''.format(start)})
+    else:
+        start_date = timezone.datetime(year=2015, month=8, day=1)
 
-    # TODO filter by start HTTP param
-    start_date = timezone.datetime(year=2015, month=8, day=1)
-    start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
+    if not timezone.is_aware(start_date):
+        start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
 
     events = KassaEvent.objects.filter(event__in=sale_events, created__gte=start_date).values_list('created')
     grouped = []
