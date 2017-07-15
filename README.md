@@ -5,9 +5,10 @@ Kassa helps you register purchased membership cards and memberships. It's a tool
 * Inside auth
 
 ## Installation
-    apt install libldap2-dev # reqs
-    virtualenv venv
+    apt install libldap2-dev libsasl2-dev # pyldap deps
+    python3 -m venv venv
     . venv/bin/activate
+    pip install -U pip wheel
     pip install -r requirements.txt
     python manage.py migrate
 
