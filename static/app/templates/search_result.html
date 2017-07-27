@@ -1,29 +1,29 @@
 {% if not placeholder %}
-    <label for="{{ res.id }}" data-phone-number="{{ res.number }}" data-user-id="{{ res.id }}" class="list-group-item search-result can-register-card{% if res.is_member == "1" %} member{% else %} not-member{% endif %}">
+    <label for="{{ res.id }}" data-phone-number="{{ res.phone_number }}" data-user-id="{{ res.id }}" class="list-group-item search-result can-register-card{% if res.is_member %} member{% else %} not-member{% endif %}">
     <input type="radio" name="user" id="{{ res.id }}"{% if checked %} checked{% endif %}>
     <div class="name">
-        <span class="glyphicon glyphicon-user"></span> {{ res.firstname }} {{ res.lastname }}
+        <span class="glyphicon glyphicon-user"></span> {{ res.first_name }} {{ res.last_name }}
     </div>
     <!-- Phone number -->
-    <div class="phone-number"><span class="glyphicon glyphicon-phone"></span> {{ res.number|phoneNumber }}</div>
+    <div class="phone-number"><span class="glyphicon glyphicon-phone"></span> {{ res.phone_number|phoneNumber }}</div>
     <div class="labels">
         <!-- Membership -->
-        {% if res.is_member == "1" %}
-            <span class="label label-success">Member: {{res.expires|default('Lifelong')}}</span>
-        {% elif res.expires == "0000-00-00" %}
+        {% if res.is_member == true %}
+            <span class="label label-success">Member: {{res.last_membership.end_date or 'Lifelong'}}</span>
+        {% elif res.last_membership == null %}
             <span class="label label-default">Registered</span>
         {% else %}
-            <span class="label label-warning">Expired: {{ res.expires }}</span>
+            <span class="label label-warning">Expired: {{ res.last_membership.end_date }}</span>
         {% endif %}
         <!-- Card -->
-        {% if res.card_number_active and res.card_is_legacy != '' %}
-            <span class="label label-card label-card-yes"><span class="card-icon"></span> {{ res.card_number_active }}</span>
+        {% if res.active_member_card %}
+            <span class="label label-card label-card-yes"><span class="card-icon"></span> {{ res.active_member_card.card_number }}</span>
         {% else %}
             <span class="label label-card label-card-no"><span class="card-icon"></span> No card</span>
         {% endif %}
-        <!-- Is active -->
-        {% if res.is_active == "1" %}
-            <span class="label label-is-active">Active</span>
+        <!-- Is volunteer -->
+        {% if res.is_volunteer %}
+            <span class="label label-is-volunteer">Volunteer</span>
         {% endif %}
     </div>
     {% if not no_user_actions %}

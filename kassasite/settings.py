@@ -113,11 +113,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 LOGIN_REDIRECT_URL = '/'
 
-INSIDE_API_KEY = ''
-INSIDE_API_URL = 'https://inside.studentersamfundet.no/api/'
+DUSKEN_API_KEY = ''
+DUSKEN_API_URL = 'https://dusken.neuf.no/api/'
 
 TEKSTMELDING_API_KEY = ''
 TEKSTMELDING_API_URL = 'https://tekstmelding.neuf.no/'
+TEKSTMELDING_ENABLED = True
 
 CORS_ORIGIN_ALLOW_ALL = True
 

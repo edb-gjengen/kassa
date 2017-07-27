@@ -116,7 +116,7 @@ gulp.task('serve', ['styles'], function () {
 
 gulp.task('watch', ['serve'], function () {
     browserSync.init({
-        proxy: 'localhost:8000'
+        proxy: 'localhost:8001'
     });
 
     // watch for changes

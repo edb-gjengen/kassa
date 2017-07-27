@@ -1,0 +1,21 @@
+<div class="list-group-item search-result entity-type-order">
+    <div class="name">
+        <input type="radio" name="user" checked>
+        <span class="glyphicon glyphicon-user"></span> <em>Unregistered member</em>
+    </div>
+    <div class="phone-number"><span class="glyphicon glyphicon-phone"></span> {{ order.phone_number|phoneNumber }}</div>
+    <div class="labels">
+        <!-- Membership -->
+        {% if order.product.is_valid == true %}
+            <span class="label label-success">Member: {{ order.product.end_date or 'Lifelong' }}</span>
+        {% else %}
+            <span class="label label-warning">Expired: {{ order.product.end_date }}</span>
+        {% endif %}
+        <!-- Card -->
+        {% if order.member_card %}
+            <span class="label label-card label-card-yes"><span class="card-icon"></span> {{ order.member_card }}</span>
+        {% else %}
+            <span class="label label-card label-card-no"><span class="card-icon"></span> No card</span>
+        {% endif %}
+    </div>
+</div>

@@ -6,14 +6,16 @@ from django.shortcuts import render
 from django.utils import timezone
 from itertools import groupby
 import json
+import uuid
 import logging
 import phonenumbers
 import requests
 
 from apps.kassa.models import KassaEvent
 from apps.kassa.forms import AddCardForm, SearchUserForm
-from apps.kassa.utils import tekstmelding_new_membership_card, inside_update_card, inside_get_card, \
-    inside_update_membership, format_phone_number, is_autumn
+from apps.kassa.utils import tekstmelding_new_membership_card, update_card, get_card, \
+    get_order, get_latest_order_by_card, get_latest_order_by_phone, get_user, get_user_by_phone, \
+    dusken_auth, update_membership, format_phone_number, is_autumn
 
 logger = logging.getLogger(__name__)
 
@@ -29,18 +31,17 @@ def register(request):
 
 
 @login_required
-def inside_user_api(request):
+def user_search(request):
     payload = {
-        'apikey': settings.INSIDE_API_KEY,
-        'q': request.GET.get('q', '')
+        'search': request.GET.get('search', '')
     }
-    url = '{}user.php'.format(settings.INSIDE_API_URL)
-    data = requests.get(url, params=payload).json()
+    url = '{}users/'.format(settings.DUSKEN_API_URL)
+    data = requests.get(url, params=payload, headers=dusken_auth).json()
 
     return JsonResponse(data)
 
 
-@login_required()
+@login_required
 def check_phone_number(request):
     number = request.GET.get('phone_number', '').strip()
 
@@ -56,115 +57,128 @@ def check_phone_number(request):
         return JsonResponse({'error': str(e).replace('(1) ', '')})
 
     number = phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.E164)
-
-    # Inside lookup existing user
-    payload = {
-        'apikey': settings.INSIDE_API_KEY,
-        'q': number
-    }
-    url = '{}phonenumber.php'.format(settings.INSIDE_API_URL)
-    inside_data = requests.get(url, params=payload).json()
-
-    # Tekstmelding lookup pending memberships
-    payload = {
-        'api_key': settings.TEKSTMELDING_API_KEY,
-        'number': number
-    }
-    url = '{}kassa/pending-membership'.format(settings.TEKSTMELDING_API_URL)
-    tekstmelding_data = requests.get(url, params=payload).json()
+    user = get_user_by_phone(number)
+    order = get_latest_order_by_phone(number)
 
     return JsonResponse({
-        'tekstmelding': tekstmelding_data,
-        'inside': inside_data
+        'user': user,
+        'order': order
     })
 
 
 @login_required
-def inside_card_api(request):
+def check_card(request):
     if request.method != 'GET':
         return JsonResponse({'error': 'Only method GET supported'})
 
-    response = inside_get_card(request.GET.get('card_number'))
-    return JsonResponse(response.json(), status=response.status_code)
+    card_number = request.GET.get('card_number')
+    response = get_card(card_number)
+    if response.status_code != 200:
+        return JsonResponse(response.json(), status=response.status_code)
+    card = response.json()
+    if card.get('user'):
+        card['user'] = get_user(card['user']).json()
+    card['order'] = None
+    if card.get('orders'):
+        card['order'] = get_latest_order_by_card(card_number)
+    card.pop('orders')
+    return JsonResponse(card, status=response.status_code)
 
 
-@login_required()
+@login_required
 def register_card_and_membership(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Only method POST supported'})
 
     post_data = json.loads(request.body.decode('utf-8'))
-    action = post_data.get('action')  # new_card_membership, update_card, add_or_renew, sms_card_notify
+    # new_card_membership, update_card, add_or_renew, sms_card_notify
     # TODO: multiple actions (to allow renewal only)
+    action = post_data.get('action')
     user_id = post_data.get('user_id')
+    order_uuid = post_data.get('order_uuid')
     card_number = post_data.get('card_number')
+    phone_number = post_data.get('phone_number')
     membership_trial = post_data.get('membership_trial')
+    membership_type = 'trial' if membership_trial else 'standard'
 
-    response = inside_update_card(
-        card_number,
-        user_id,
-        post_data.get('phone_number'),
-        action,
-        membership_trial
-    )
-    if response.status_code != 200:
-        return JsonResponse(response.json(), status=response.status_code)
+    # Update card number on user or order
+    if action in ('update_card', 'sms_card_notify'):
+        if action == 'update_card' and user_id:
+            response = update_card(card_number, user_id=user_id)
+        elif action == 'sms_card_notify' and order_uuid:
+            response = update_card(card_number, order_uuid=order_uuid)
+        else:
+            assert user_id or order_uuid
+        if response.status_code != 200:
+            return JsonResponse(response.json(), status=response.status_code)
 
-    event_data = {
-        'event': KassaEvent.UPDATE_CARD,
-        'user_phone_number': format_phone_number(post_data.get('phone_number')),
-        'card_number': card_number
-    }
-    if user_id:
-        event_data.update({'user_inside_id': user_id})
+        event_data = {
+            'event': KassaEvent.UPDATE_CARD,
+            'user_phone_number': phone_number,
+            'card_number': card_number,
+            'user_dusken_id': user_id,
+        }
+        logger.debug(event_data)
+        KassaEvent.objects.create(**event_data)
 
-    logger.debug(event_data)
-
-    KassaEvent.objects.create(**event_data)
-
-    card_update_response = response.json()
+    # Add initial or renew membership for existing user or order
+    if action in ('add_or_renew', 'new_card_membership'):
+        transaction_id = uuid.uuid4()
+        response = update_membership(
+            user=user_id,
+            phone_number=phone_number,
+            card_number=card_number,
+            membership_type=membership_type,
+            transaction_id=str(transaction_id))
+        KassaEvent.objects.create(
+            event=KassaEvent.ADD_OR_RENEW if membership_type != 'trial' else KassaEvent.MEMBERSHIP_TRIAL,
+            user_dusken_id=user_id,
+            card_number=card_number,
+            user_phone_number=phone_number,
+            transaction_id=transaction_id
+        )
 
     # Send activation notification (link) to user by SMS
-    if action == 'new_card_membership' or action == 'sms_card_notify':
-        card = card_update_response['card']
+    if action in ('new_card_membership', 'sms_card_notify'):
         event = KassaEvent.NEW_CARD_MEMBERSHIP
         if action == 'sms_card_notify':
             event = KassaEvent.SMS_CARD_NOTIFY
-        elif event == KassaEvent.NEW_CARD_MEMBERSHIP and membership_trial is not None:
-            event = KassaEvent.MEMBERSHIP_TRIAL
 
         # FIXME: could be async
-        tekstmelding_new_membership_card(card_number=card['card_number'], phone_number=card['owner_phone_number'])
+        tekstmelding_new_membership_card(card_number=card_number,
+                                         phone_number=phone_number)
         KassaEvent.objects.create(
             event=event,
-            card_number=card['card_number'],
-            user_phone_number=card['owner_phone_number']
-        )
-
-    # Add initial or renew membership for existing user
-    elif action == 'add_or_renew':
-        response = inside_update_membership(user_id, post_data.get('purchased'), membership_trial=membership_trial)
-        KassaEvent.objects.create(
-            event=KassaEvent.ADD_OR_RENEW if membership_trial is None else KassaEvent.MEMBERSHIP_TRIAL,
-            user_inside_id=user_id
+            card_number=card_number,
+            user_phone_number=phone_number
         )
 
     return JsonResponse(response.json(), status=response.status_code)
 
 
-@login_required()
+@login_required
 def renew_membership(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Only method POST supported'})
 
     post_data = json.loads(request.body.decode('utf-8'))
     user_id = post_data.get('user_id')
+    phone_number = post_data.get('phone_number')
+    card_number = post_data.get('card_number')
     membership_trial = post_data.get('membership_trial')
+    membership_type = 'trial' if membership_trial else 'standard'
+    transaction_id = str(uuid.uuid4())
 
-    response = inside_update_membership(user_id, purchased=post_data.get('purchased'), membership_trial=membership_trial)
+    response = update_membership(
+        user=user_id,
+        phone_number=phone_number,
+        card_number=card_number,
+        membership_type=membership_type,
+        transaction_id=transaction_id)
     KassaEvent.objects.create(
         event=KassaEvent.RENEW_ONLY if membership_trial is None else KassaEvent.MEMBERSHIP_TRIAL,
-        user_inside_id=user_id
+        user_dusken_id=user_id,
+        transaction_id=transaction_id
     )
 
     return JsonResponse(response.json(), status=response.status_code)

@@ -14,3 +14,4 @@ class AddCardForm(forms.Form):
     card_number = forms.IntegerField(widget=forms.NumberInput(attrs={'autofocus': True}))
     phone_number = PhoneNumberField(widget=forms.TextInput(attrs={'type': 'tel'}))
     user_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    order_uuid = forms.IntegerField(widget=forms.HiddenInput(), required=False)

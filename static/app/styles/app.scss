@@ -70,7 +70,7 @@ input[type=number] {
 .glyphicon-phone-large {
   font-size: 26px;
 }
-.register-card-form--selected-user-wrap {
+.register-card-form--selected-entity-wrap {
   min-height: 78px;
   margin-bottom: 10px;
 }
@@ -84,6 +84,11 @@ input[type=number] {
 [for=id_membership_trial] {
   padding-left: 6px;
 
+}
+
+#membership-submit-btn:not(:disabled) {
+  background-color: #dff0d8;
+  border-color: #3c763d;
 }
 
 .query-form {
@@ -111,7 +116,7 @@ input[type=number] {
   .label-card-yes {
     color: $green-color;
   }
-  .label-is-active {
+  .label-is-volunteer {
     background-color: $active-color;
   }
   [type=radio] {
