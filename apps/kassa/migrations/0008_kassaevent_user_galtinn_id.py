@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='kassaevent',
-            name='user_dusken_id',
+            name='user_galtinn_id',
             field=models.IntegerField(blank=True, null=True),
         ),
     ]

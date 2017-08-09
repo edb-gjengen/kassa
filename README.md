@@ -13,16 +13,16 @@ Kassa helps you register purchased membership cards and memberships. It's a tool
     python manage.py migrate
 
 ## Configuration
-Create a user in Dusken with the following permissions:
-* dusken | User | Can view User
-* dusken | Member card | Can change Member card
-* dusken | Member card | Can view Member card
-* dusken | Membership | Can add Membership
-* dusken | Membership | Can view Membership
-* dusken | Order | Can view Order
+Create a user in Galtinn with the following permissions:
+* galtinn | User | Can view User
+* galtinn | Member card | Can change Member card
+* galtinn | Member card | Can view Member card
+* galtinn | Membership | Can add Membership
+* galtinn | Membership | Can view Membership
+* galtinn | Order | Can view Order
 
-Fetch DUSKEN_API_KEY:
-    curl -H "Content-Type: application/json" -X POST -d '{"username":"apiuser","password":"test"}' DUSKEN_API_URL/auth/obtain-token/
+Fetch GALTINN_API_KEY:
+    curl -H "Content-Type: application/json" -X POST -d '{"username":"apiuser","password":"test"}' GALTINN_API_URL/auth/obtain-token/
 
 If developing you can disable calls to Tekstmelding in local_settings.py:
     TEKSTMELDING_ENABLED = False

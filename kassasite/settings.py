@@ -113,12 +113,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 LOGIN_REDIRECT_URL = '/'
 
-DUSKEN_API_KEY = ''
-DUSKEN_API_URL = 'https://dusken.neuf.no/api/'
+GALTINN_API_KEY = ''
+GALTINN_API_URL = 'https://galtinn.neuf.no/api/'
+GALTINN_ACTIVATION_URL = 'https://galtinn.neuf.no/activate/{to}/{code}'
 
 TEKSTMELDING_API_KEY = ''
 TEKSTMELDING_API_URL = 'https://tekstmelding.neuf.no/'
 TEKSTMELDING_ENABLED = True
+TEKSTMELDING_ACTIVATION_SMS_TEMPLATE = 'Velkommen som medlem! Registrer deg her: {url}'
 
 CORS_ORIGIN_ALLOW_ALL = True
 

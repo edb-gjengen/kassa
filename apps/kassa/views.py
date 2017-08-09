@@ -13,9 +13,9 @@ import requests
 
 from apps.kassa.models import KassaEvent
 from apps.kassa.forms import AddCardForm, SearchUserForm
-from apps.kassa.utils import tekstmelding_new_membership_card, update_card, get_card, \
+from apps.kassa.utils import send_sms_activation_link, update_card, get_card, \
     get_order, get_latest_order_by_card, get_latest_order_by_phone, get_user, get_user_by_phone, \
-    dusken_auth, update_membership, format_phone_number, is_autumn
+    galtinn_auth, update_membership, format_phone_number, is_autumn
 
 logger = logging.getLogger(__name__)
 
@@ -35,8 +35,8 @@ def user_search(request):
     payload = {
         'search': request.GET.get('search', '')
     }
-    url = '{}users/'.format(settings.DUSKEN_API_URL)
-    data = requests.get(url, params=payload, headers=dusken_auth).json()
+    url = '{}users/'.format(settings.GALTINN_API_URL)
+    data = requests.get(url, params=payload, headers=galtinn_auth).json()
 
     return JsonResponse(data)
 
@@ -100,6 +100,9 @@ def register_card_and_membership(request):
     phone_number = post_data.get('phone_number')
     membership_trial = post_data.get('membership_trial')
     membership_type = 'trial' if membership_trial else 'standard'
+    transaction_id = uuid.uuid4()
+
+    logger.debug('register_card_and_membership post_data %r', post_data)
 
     # Update card number on user or order
     if action in ('update_card', 'sms_card_notify'):
@@ -116,14 +119,14 @@ def register_card_and_membership(request):
             'event': KassaEvent.UPDATE_CARD,
             'user_phone_number': phone_number,
             'card_number': card_number,
-            'user_dusken_id': user_id,
+            'user_galtinn_id': user_id,
+            'transaction_id': transaction_id
         }
         logger.debug(event_data)
         KassaEvent.objects.create(**event_data)
 
     # Add initial or renew membership for existing user or order
     if action in ('add_or_renew', 'new_card_membership'):
-        transaction_id = uuid.uuid4()
         response = update_membership(
             user=user_id,
             phone_number=phone_number,
@@ -132,7 +135,7 @@ def register_card_and_membership(request):
             transaction_id=str(transaction_id))
         KassaEvent.objects.create(
             event=KassaEvent.ADD_OR_RENEW if membership_type != 'trial' else KassaEvent.MEMBERSHIP_TRIAL,
-            user_dusken_id=user_id,
+            user_galtinn_id=user_id,
             card_number=card_number,
             user_phone_number=phone_number,
             transaction_id=transaction_id
@@ -145,12 +148,13 @@ def register_card_and_membership(request):
             event = KassaEvent.SMS_CARD_NOTIFY
 
         # FIXME: could be async
-        tekstmelding_new_membership_card(card_number=card_number,
-                                         phone_number=phone_number)
+        send_sms_activation_link(phone_number=phone_number,
+                                 transaction_id=str(transaction_id))
         KassaEvent.objects.create(
             event=event,
             card_number=card_number,
-            user_phone_number=phone_number
+            user_phone_number=phone_number,
+            transaction_id=transaction_id
         )
 
     return JsonResponse(response.json(), status=response.status_code)
@@ -169,6 +173,8 @@ def renew_membership(request):
     membership_type = 'trial' if membership_trial else 'standard'
     transaction_id = str(uuid.uuid4())
 
+    logger.debug('renew_membership post_data %r', post_data)
+
     response = update_membership(
         user=user_id,
         phone_number=phone_number,
@@ -177,32 +183,8 @@ def renew_membership(request):
         transaction_id=transaction_id)
     KassaEvent.objects.create(
         event=KassaEvent.RENEW_ONLY if membership_trial is None else KassaEvent.MEMBERSHIP_TRIAL,
-        user_dusken_id=user_id,
+        user_galtinn_id=user_id,
         transaction_id=transaction_id
     )
 
     return JsonResponse(response.json(), status=response.status_code)
-
-
-def stats_card_sales(request):
-    sale_events = [KassaEvent.ADD_OR_RENEW, KassaEvent.NEW_CARD_MEMBERSHIP, KassaEvent.RENEW_ONLY]
-    start = request.GET.get('start')
-    if start:
-        try:
-            start_date = timezone.datetime.strptime(start, '%Y-%m-%d')
-        except ValueError:
-            logger.info('Invalid start date in param start: \'%s\'', start)
-            return JsonResponse({'error': 'Invalid start date in param start: \'{}\''.format(start)})
-    else:
-        start_date = timezone.datetime(year=2015, month=8, day=1)
-
-    if not timezone.is_aware(start_date):
-        start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
-
-    events = KassaEvent.objects.filter(event__in=sale_events, created__gte=start_date).values_list('created')
-    grouped = []
-    date_format = '%Y-%m-%d'
-    for key, values in groupby(events, key=lambda row: row[0].strftime(date_format)):
-        grouped.append({'date': key, 'sales': len(list(values))})
-
-    return JsonResponse({'memberships': grouped})

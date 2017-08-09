@@ -7,68 +7,67 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-dusken_auth = {
-    'Authorization': 'Token {}'.format(settings.DUSKEN_API_KEY)
+galtinn_auth = {
+    'Authorization': 'Token {}'.format(settings.GALTINN_API_KEY)
+}
+
+tekstmelding_auth = {
+    'Authorization': 'Token {}'.format(settings.TEKSTMELDING_API_KEY)
 }
 
 
-def tekstmelding_new_membership_card(card_number, phone_number):
+def send_sms_activation_link(phone_number, transaction_id):
+    to = phone_number.replace('+', ''),
+    code = transaction_id[:8]
+    activation_url = settings.GALTINN_ACTIVATION_URL.format(to=to, code=code)
+    message = settings.TEKSTMELDING_ACTIVATION_SMS_TEMPLATE.format(url=activation_url)
     payload = {
-        'phone_number': phone_number,
-        'card_number': card_number,
-        'action': 'new_card_no_user',
+        'to': to,
+        'message': message
     }
-
     if not settings.TEKSTMELDING_ENABLED:
-        logger.info('Tekstmelding disabled. Payload would be: ', payload)
+        logger.info('Tekstmelding disabled. Payload would be: {}'.format(payload))
         return
-
-    url = '{}kassa/new-membership-card'.format(settings.TEKSTMELDING_API_URL)
-    response = requests.post(
-        url,
-        json=payload,
-        params={'api_key': settings.TEKSTMELDING_API_KEY},
-        headers={'Content-Type': 'application/json'}
-    )
-
+    url = '{}send'.format(settings.TEKSTMELDING_API_URL)
+    response = requests.post(url, json=payload, headers=tekstmelding_auth)
     return response.json()
 
 
 def get_card(card_number):
-    url = '{}cards/{}/'.format(settings.DUSKEN_API_URL, card_number)
-    return requests.get(url, headers=dusken_auth)
+    url = '{}cards/{}/'.format(settings.GALTINN_API_URL, card_number)
+    return requests.get(url, headers=galtinn_auth)
 
 
 def get_order(order_uuid):
-    url = '{}orders/{}/'.format(settings.DUSKEN_API_URL, order_uuid)
-    return requests.get(url, headers=dusken_auth)
+    url = '{}orders/{}/'.format(settings.GALTINN_API_URL, order_uuid)
+    return requests.get(url, headers=galtinn_auth)
 
 
 def get_latest_order_by_card(card_number):
-    url = '{}orders/'.format(settings.DUSKEN_API_URL)
+    url = '{}orders/'.format(settings.GALTINN_API_URL)
     payload = {'card_number': card_number}
-    orders = requests.get(url, params=payload, headers=dusken_auth).json()
+    orders = requests.get(url, params=payload, headers=galtinn_auth).json()
     return orders.get('results')[0]
 
 
 def get_latest_order_by_phone(phone_number):
-    url = '{}orders/'.format(settings.DUSKEN_API_URL)
+    url = '{}orders/'.format(settings.GALTINN_API_URL)
     payload = {'phone_number': phone_number}
-    orders = requests.get(url, params=payload, headers=dusken_auth).json()
+    orders = requests.get(url, params=payload, headers=galtinn_auth).json()
     if orders.get('count'):
         return orders.get('results')[0]
     return None
 
 
 def get_user(user_id):
-    url = '{}users/{}/'.format(settings.DUSKEN_API_URL, user_id)
-    return requests.get(url, headers=dusken_auth)
+    url = '{}users/{}/'.format(settings.GALTINN_API_URL, user_id)
+    return requests.get(url, headers=galtinn_auth)
 
 
 def get_user_by_phone(phone_number):
-    url = '{}users/'.format(settings.DUSKEN_API_URL)
+    url = '{}users/'.format(settings.GALTINN_API_URL)
     payload = {'phone_number': phone_number}
-    users = requests.get(url, params=payload, headers=dusken_auth).json()
+    users = requests.get(url, params=payload, headers=galtinn_auth).json()
     if users.get('count') == 1:
         return users.get('results')[0]
     return None
@@ -76,19 +75,19 @@ def get_user_by_phone(phone_number):
 
 def update_card(card_number, user_id=None, order_uuid=None):
     assert not (user_id and order_uuid)
-    url = '{}kassa/card/'.format(settings.DUSKEN_API_URL)
+    url = '{}kassa/card/'.format(settings.GALTINN_API_URL)
     payload = {
         'member_card': card_number,
         'user': user_id,
         'order': order_uuid,
     }
-    return requests.patch(url, json=payload, headers=dusken_auth)
+    return requests.patch(url, json=payload, headers=galtinn_auth)
 
 
 def update_membership(user=None, phone_number=None, card_number=None, membership_type=None,
                       transaction_id=None):
     assert membership_type in ('standard', 'trial')
-    url = '{}kassa/membership/'.format(settings.DUSKEN_API_URL)
+    url = '{}kassa/membership/'.format(settings.GALTINN_API_URL)
     payload = {
         'user': user,
         'phone_number': phone_number,
@@ -96,7 +95,7 @@ def update_membership(user=None, phone_number=None, card_number=None, membership
         'membership_type': membership_type,
         'transaction_id': transaction_id,
     }
-    return requests.post(url, json=payload, headers=dusken_auth)
+    return requests.post(url, json=payload, headers=galtinn_auth)
 
 
 def format_phone_number(number):

@@ -21,7 +21,7 @@ class KassaEvent(models.Model):
     )
     event = models.CharField(max_length=255, choices=EVENT_CHOICES)
     card_number = models.IntegerField(null=True, blank=True)
-    user_dusken_id = models.IntegerField(null=True, blank=True)
+    user_galtinn_id = models.IntegerField(null=True, blank=True)
     user_inside_id = models.IntegerField(null=True, blank=True)
     user_phone_number = models.CharField(max_length=100, null=True, blank=True)
     transaction_id = models.UUIDField(null=True, blank=True)
