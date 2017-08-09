@@ -17,7 +17,7 @@ tekstmelding_auth = {
 
 
 def send_sms_activation_link(phone_number, transaction_id):
-    to = phone_number.replace('+', ''),
+    to = phone_number.replace('+', '')
     code = transaction_id[:8]
     activation_url = settings.GALTINN_ACTIVATION_URL.format(to=to, code=code)
     message = settings.TEKSTMELDING_ACTIVATION_SMS_TEMPLATE.format(url=activation_url)
