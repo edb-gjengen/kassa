@@ -97,12 +97,13 @@ def register_card_and_membership(request):
     user_id = post_data.get('user_id')
     order_uuid = post_data.get('order_uuid')
     card_number = post_data.get('card_number')
-    phone_number = post_data.get('phone_number')
+    phone_number_raw = post_data.get('phone_number')
     membership_trial = post_data.get('membership_trial')
     membership_type = 'trial' if membership_trial else 'standard'
     transaction_id = uuid.uuid4()
 
     logger.debug('register_card_and_membership post_data %r', post_data)
+    phone_number = format_phone_number(phone_number_raw)
 
     # Update card number on user or order
     if action in ('update_card', 'sms_card_notify'):
@@ -167,13 +168,14 @@ def renew_membership(request):
 
     post_data = json.loads(request.body.decode('utf-8'))
     user_id = post_data.get('user_id')
-    phone_number = post_data.get('phone_number')
+    phone_number_raw = post_data.get('phone_number')
     card_number = post_data.get('card_number')
     membership_trial = post_data.get('membership_trial')
     membership_type = 'trial' if membership_trial else 'standard'
     transaction_id = str(uuid.uuid4())
 
     logger.debug('renew_membership post_data %r', post_data)
+    phone_number = format_phone_number(phone_number_raw)
 
     response = update_membership(
         user=user_id,
