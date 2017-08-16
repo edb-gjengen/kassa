@@ -184,7 +184,7 @@ function updateMemberShipButton(user, order) {
         //else if (user.last_membership.end_date <= today_plus_thirty_days && user.active_member_card) {
         /* ...with a membership that expires soon can renew */
         else if (user.last_membership.end_date <= today_plus_thirty_days) {
-            _dom.membershipSubmitButton.prop('disable', false);
+            _dom.membershipSubmitButton.prop('disabled', false);
         }
     }
     /* User with expired membership can renew */
