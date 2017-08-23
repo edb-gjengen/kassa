@@ -108,9 +108,12 @@ def register_card_and_membership(request):
     # Update card number on user or order
     if action in ('update_card', 'sms_card_notify'):
         if action == 'update_card' and user_id:
-            response = update_card(card_number, user_id=user_id)
+            response = update_card(card_number,
+                                   user_id=user_id)
         elif action == 'sms_card_notify' and order_uuid:
-            response = update_card(card_number, order_uuid=order_uuid)
+            response = update_card(card_number,
+                                   order_uuid=order_uuid,
+                                   transaction_id=transaction_id)
         else:
             assert user_id or order_uuid
         if response.status_code != 200:

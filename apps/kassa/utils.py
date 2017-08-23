@@ -73,13 +73,14 @@ def get_user_by_phone(phone_number):
     return None
 
 
-def update_card(card_number, user_id=None, order_uuid=None):
+def update_card(card_number, user_id=None, order_uuid=None, transaction_id=None):
     assert not (user_id and order_uuid)
     url = '{}kassa/card/'.format(settings.GALTINN_API_URL)
     payload = {
         'member_card': card_number,
         'user': user_id,
         'order': order_uuid,
+        'transaction_id': transaction_id,
     }
     return requests.patch(url, json=payload, headers=galtinn_auth)
 
