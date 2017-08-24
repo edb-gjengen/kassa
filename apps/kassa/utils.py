@@ -79,7 +79,7 @@ def update_card(card_number, user_id=None, order_uuid=None, transaction_id=None)
     payload = {
         'member_card': card_number,
         'user': user_id,
-        'order': order_uuid,
+        'order': str(order_uuid),
         'transaction_id': transaction_id,
     }
     return requests.patch(url, json=payload, headers=galtinn_auth)
