@@ -306,8 +306,8 @@ function checkPhoneNumber() {
 var _dom;
 var users;
 var searching; /* search ajax request */
-var selectedUser;
-var membershipOrder; /* selected order object */
+var selectedUser = null;
+var membershipOrder = null; /* selected order object */
 var cardForm = {
     fields: {
         cardNumber: false,
