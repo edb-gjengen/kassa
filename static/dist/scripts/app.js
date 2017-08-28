@@ -488,11 +488,15 @@ $(document).ready(function(){
         if (selectedUser === null && membershipOrder === null) {
             // Unknown phone / card, new membership
             payload.action = 'new_card_membership';
-        } else if (selectedUser === null && membershipOrder !== null &&
-                   membershipOrder.member_card === null && membershipOrder.product.is_valid) {
-            // Associate member card with a valid membership orer
-            payload.action = 'sms_card_notify';
-            payload.order_uuid = membershipOrder.uuid;
+        } else if (selectedUser === null && membershipOrder !== null) {
+            if (membershipOrder.member_card === null && membershipOrder.product.is_valid) {
+                // Associate member card with a valid membership order
+                payload.action = 'sms_card_notify';
+                payload.order_uuid = membershipOrder.uuid;
+            } else {
+                // New card for expired order -- treat as new card membership
+                payload.action = 'new_card_membership';
+            }
         } else if (selectedUser !== null && selectedUser.is_member) {
             // Add member card to a user
             payload.action = 'update_card';
