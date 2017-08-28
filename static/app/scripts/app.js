@@ -486,16 +486,19 @@ $(document).ready(function(){
         // FIXME: get from form
         // action: 'new_card_membership', 'update_card', 'add_or_renew', 'sms_card_notify'
         if (selectedUser === null && membershipOrder === null) {
+            // Unknown phone / card, new membership
             payload.action = 'new_card_membership';
-        } else if (selectedUser === null && membershipOrder !== null) {
+        } else if (selectedUser === null && membershipOrder !== null &&
+                   membershipOrder.member_card === null && membershipOrder.product.is_valid) {
+            // Associate member card with a valid membership orer
             payload.action = 'sms_card_notify';
             payload.order_uuid = membershipOrder.uuid;
+        } else if (selectedUser !== null && selectedUser.is_member) {
+            // Add member card to a user
+            payload.action = 'update_card';
         } else {
-            if (selectedUser.is_member) {
-                payload.action = 'update_card';
-            } else {
-                payload.action = 'add_or_renew'; // Note: could also update card number
-            }
+            // New order for user or non-user
+            payload.action = 'add_or_renew'; // Note: could also update card number
         }
         $.ajax(urls.registerCardAndMembership, {
             data: JSON.stringify(payload),
