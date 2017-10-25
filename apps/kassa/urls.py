@@ -1,6 +1,6 @@
 from django.conf.urls import url
-from apps.kassa.views import (register, user_search, check_card, check_phone_number,
-                              register_card_and_membership, renew_membership)
+from apps.kassa.views import (register, user_search, check_card, check_phone_number, register_card_and_membership,
+                              renew_membership)
 
 urlpatterns = [
     url(r'^$', register, name='register'),
