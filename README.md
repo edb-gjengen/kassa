@@ -2,7 +2,7 @@ Kassa helps you register purchased membership cards and memberships. It's a tool
 
 ## TODO
 * Loading state on submit buttons
-* Inside auth
+* Galtinn/LDAP auth
 
 ## Installation
     apt install libldap2-dev libsasl2-dev # pyldap deps
