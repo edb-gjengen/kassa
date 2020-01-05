@@ -1,18 +1,14 @@
-{% load staticfiles raven %}
+{% load static %}
 <!DOCTYPE html>
-<html>
-<head lang="en">
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Registrer medlemskap{% endblock %}</title>
     <link rel="shortcut icon" href="{% static "dist/images/favicon.ico" %}">
-    <!--<link rel="stylesheet" href="{% static "dist/styles/vendor.css" %}">-->
-    <link rel="stylesheet" href="{% static "dist/styles/app.css" %}">
-    <script src="{% static "dist/scripts/vendor.js" %}"></script>
-    <script src="{% static "dist/scripts/templates.js" %}"></script>
-    <script src="{% static "dist/scripts/app.js" %}"></script>
-    <script src="https://cdn.ravenjs.com/3.5.1/raven.min.js"></script>
+    <link rel="stylesheet" href="{% static "dist/main.css" %}">
+
 </head>
 <body>
 <div class="toast-wrap"></div>
@@ -24,11 +20,15 @@
 </div>
 <footer class="footer">
     <div class="container">
-        <div class="credits"><p><a href="https://studentersamfundet.no" title="Det Norske Studentersamfund"><img src="{% static "dist/images/logo.png" %}" width="70" height="70"></a></p>
+        <div class="credits"><p><a href="https://studentersamfundet.no" title="Det Norske Studentersamfund"><img src="{% static "dist/images/logo.png" %}" width="70" height="70" alt="DNS logo"></a></p>
         Laget med <span class="love" title="kærlighed">♥</span> av <a href="http://kak.studentersamfundet.no/" title="Kommunikasjonsavdelingen">KAK</a></div>
 
     </div>
 </footer>
-    <script>Raven.config('{% sentry_public_dsn %}').install()</script>
+    {% if SENTRY_DSN %}
+        <script src="https://browser.sentry-cdn.com/5.10.2/bundle.min.js" integrity="sha384-ssBfXiBvlVC7bdA/VX03S88B5MwXQWdnpJRbUYFPgswlOBwETwTp6F3SMUNpo9M9" crossorigin="anonymous"></script>
+        <script>Sentry.init({ dsn: '{{ SENTRY_DSN }}', environment: '{{ SENTRY_ENVIRONMENT }}' });</script>
+    {% endif %}
+    <script src="{% static "dist/main.js" %}"></script>
 </body>
 </html>

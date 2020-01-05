@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
-import raven
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -41,20 +39,18 @@ INSTALLED_APPS = (
     'bootstrapform',
     'django_extensions',
     'corsheaders',
-    'raven.contrib.django.raven_compat',
 )
 
 LOCAL_APPS = ('apps.kassa',)
 
 INSTALLED_APPS += LOCAL_APPS
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -75,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.kassa.context_processors.sentry',
             ],
         },
     },
@@ -124,11 +121,6 @@ TEKSTMELDING_ACTIVATION_SMS_TEMPLATE = 'Velkommen som medlem! Registrer deg her:
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-RAVEN_CONFIG = {
-    'dsn': os.getenv('RAVEN_DSN'),
-    'release': raven.fetch_git_sha(BASE_DIR)
-}
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -139,10 +131,6 @@ LOGGING = {
         },
     },
     'handlers': {
-        'sentry': {
-            'level': 'WARNING',  # To capture more than ERROR, change to WARNING, INFO, etc.
-            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -152,31 +140,18 @@ LOGGING = {
     'loggers': {
         'root': {
             'level': 'WARNING',
-            'handlers': ['sentry', 'console'],
-        },
-        'django': {
-            'level': 'DEBUG',
             'handlers': ['console'],
-            'propagate': True,
         },
         'django.db.backends': {
             'level': 'ERROR',
             'handlers': ['console'],
             'propagate': False,
         },
-        'raven': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'sentry.errors': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
     },
 }
 
+SENTRY_DSN = None
+SENTRY_ENVIRONMENT = 'dev'
 
 # Local settings
 try:

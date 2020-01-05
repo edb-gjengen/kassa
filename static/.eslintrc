@@ -1,0 +1,29 @@
+{
+  "env": {
+    "browser": true
+  },
+  "extends": [
+    "airbnb-base",
+    "plugin:prettier/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings"
+  ],
+  "rules": {
+    "no-plusplus": "off",
+    "no-console": "off",
+    "no-underscore-dangle": "off",
+    "no-param-reassign": "off",
+    "no-restricted-syntax": "off",
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {}, // https://github.com/benmosher/eslint-plugin-import/issues/1396#issuecomment-509384041
+      "webpack": {
+        "config": "webpack.config.js"
+      }
+    }
+  }
+,
+  "plugins": ["prettier"],
+  "parser": "babel-eslint"
+}

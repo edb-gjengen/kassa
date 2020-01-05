@@ -1,11 +1,11 @@
-$icon-font-path: '../fonts/';
+$icon-font-path: './fonts/';
 $green-color: #5cb85c;
 $red-color: #ff433d;
 $yellow-color: #f8ff5b;
 $active-color: darkred;
 
 /* Vendor styles */
-@import "../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 
 /* Global styles */
 body {
