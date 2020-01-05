@@ -12,7 +12,9 @@
     "bootstrap-sass": "^3.4.1",
     "jquery": "^3.4.1",
     "list.js": "^1.5.0",
-    "lodash": "^4.17.15",
+    "lodash.debounce": "^4.0.8",
+    "lodash.frompairs": "^4.0.1",
+    "lodash.sortby": "^4.7.0",
     "moment": "^2.24.0",
     "nunjucks": "^3.2.0"
   },

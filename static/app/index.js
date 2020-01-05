@@ -1,9 +1,10 @@
 import * as $ from 'jquery';
 import moment from 'moment';
 import nunjucks from 'nunjucks';
-import _ from 'lodash';
+import debounce from 'lodash.debounce';
+import sortBy from 'lodash.sortby';
+import fromPairs from 'lodash.frompairs';
 
-//
 import 'bootstrap-sass/assets/javascripts/bootstrap/tooltip';
 import 'bootstrap-sass/assets/javascripts/bootstrap/popover';
 
@@ -70,7 +71,7 @@ function formatPhoneNumber(str) {
 }
 
 function sortSearchResults(results) {
-  return _.sortBy(results, (x) => {
+  return sortBy(results, (x) => {
     if (x.last_membership) {
       if (x.last_membership.end_date) {
         return 0 - moment(x.last_membership.end_date).unix();
@@ -167,7 +168,7 @@ function setSelectedUser(user, updateSearchResult) {
     const staleSearchResult = _dom.results.find('.search-result').removeClass('selected');
     staleSearchResult.find('input').prop('checked', false);
     /* User is still in search result, mark selected */
-    if (user && _.findWhere(users, { id: user.id })) {
+    if (user && users.find(({ id }) => id === user.id)) {
       const searchResult = _dom.results.find(`[data-user-id="${user.id}"]`).toggleClass('selected');
       searchResult.find('input').prop('checked', true);
     }
@@ -243,7 +244,7 @@ function resetSearchForm(resetNative) {
 }
 
 function cardFormIsValid() {
-  return _.values(cardForm.fields).every((v) => v);
+  return Object.values(cardForm.fields).every((v) => v);
 }
 
 function updateSubmitButton() {
@@ -287,8 +288,8 @@ function validateCardNumber(val) {
 
 function getFormData(formElement) {
   let formData = formElement.serializeArray();
-  formData = _.object(
-    _.map(formData, (x) => {
+  formData = fromPairs(
+    formData.map((x) => {
       return [x.name, x.value || null];
     })
   );
@@ -378,7 +379,7 @@ $(document).ready(function() {
     membershipTrialCheckBox: $('#id_membership_trial')
   };
 
-  const lazyCheckPhoneNumber = _.debounce(checkPhoneNumber, 250);
+  const lazyCheckPhoneNumber = debounce(checkPhoneNumber, 250);
   _dom.phoneNumberField.on('input', (e) => {
     const val = e.target.value.trim();
     const validationMsg = validatePhoneNumber(val);
@@ -482,7 +483,7 @@ $(document).ready(function() {
     $('.search-result').removeClass('selected');
     label.toggleClass('selected');
 
-    setSelectedUser(_.findWhere(users, { id: userId }));
+    setSelectedUser(users.find(({ id }) => id === userId));
 
     /* Update phone number field */
     if (number === '-') {
