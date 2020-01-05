@@ -131,21 +131,28 @@ function updateMemberShipButton(user, order) {
     }
     /* ...or expiring soon and the user has a card */
     // else if (user.last_membership.end_date <= todayPlusThirtyDays && user.active_member_card) {
+
+    // FIXME: ponas workaround 2019-12-17, block below commented out
+    _dom.membershipSubmitButton.prop('disabled', false);
+
     /* ...with a membership that expires soon can renew */
-    else if (user.last_membership.end_date <= todayPlusThirtyDays) {
-      _dom.membershipSubmitButton.prop('disabled', false);
-    }
+    // else if (user.last_membership.end_date <= todayPlusThirtyDays) {
+    //   _dom.membershipSubmitButton.prop('disabled', false);
+    // }
   }
   /* User with expired membership can renew */
   // else if (user && !user.is_member && user.active_member_card) {
   else if (user && !user.is_member) {
     _dom.membershipSubmitButton.prop('disabled', false);
   } else if (order) {
+    // FIXME: ponas workaround 2019-12-17, block below commented out
+    _dom.membershipSubmitButton.prop('disabled', false);
+
     /* Order */
     /* If the membership has expired it can be renewed */
-    if (!order.product.is_valid && order.product.end_date <= todayPlusThirtyDays) {
-      _dom.membershipSubmitButton.prop('disabled', false);
-    }
+    // if (!order.product.is_valid && order.product.end_date <= todayPlusThirtyDays) {
+    //   _dom.membershipSubmitButton.prop('disabled', false);
+    // }
   } else {
     _dom.membershipSubmitButton.prop('disabled', true);
   }

@@ -23,9 +23,10 @@
 
             <button id="register-submit-btn" type="submit" class="btn btn-primary btn-lg" disabled>{% trans "Register card" %}</button>
             <button type="reset" class="register-reset-btn btn btn-default">{% trans "Reset" %}</button>
-            {% if show_trial_membership %}
+{# FIXME(nikolark): 2020-01-05 keeping yolo changes from server #}
+{#            {% if show_trial_membership %}#}
                 <br><br><input type="checkbox" class="" id="id_membership_trial" name="membership_trial" value="volunteer"><label for="id_membership_trial" title="{% trans "Expires January 1. next year" %}">{% trans "Trial membership" %}</label>
-            {% endif %}
+{#            {% endif %}#}
             <br><br>
 
             <button id="membership-submit-btn" type="submit" class="btn btn-default" disabled>{% trans "Renew membership only" %}</button>
