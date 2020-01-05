@@ -168,7 +168,7 @@ function setSelectedUser(user, updateSearchResult) {
     const staleSearchResult = _dom.results.find('.search-result').removeClass('selected');
     staleSearchResult.find('input').prop('checked', false);
     /* User is still in search result, mark selected */
-    if (user && users.find(({ id }) => id === user.id)) {
+    if (user && users && users.find(({ id }) => id === user.id)) {
       const searchResult = _dom.results.find(`[data-user-id="${user.id}"]`).toggleClass('selected');
       searchResult.find('input').prop('checked', true);
     }
