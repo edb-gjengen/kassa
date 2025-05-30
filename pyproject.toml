@@ -1,0 +1,47 @@
+[project]
+name = "kassa"
+version = "0.1.0"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django==4.2.*",
+    "django-auth-ldap==5.*",
+    "django-bootstrap-form==3.4",
+    "django-cors-headers==4.*",
+    "django-extensions==4.*",
+    "django-phonenumber-field==8.*",
+    "fabric==3.*",
+    "gunicorn==23.*",
+    "mysqlclient==2.*",
+    "phonenumbers==9.*",
+    "requests==2.*",
+    "sentry-sdk==1.*",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "D",                # pydocstyle: Allow undocumented code
+  "ANN",              # flake8-annotations: Allow untyped code
+  "TD", "FIX",        # Allow TODOs and FIXMEs
+  "FBT002",           # Allow boolean args
+  "G004",             # Allow logging using f-string
+  "EM101", "EM102",   # Allow string in exceptions (prioritice code readability vs exception time readability)
+  "TRY003",           # Allow long exception messages
+  "E501",             # Allow long lines
+  "COM812", "ISC001", # Avoid conflicting with ruff formatter
+  "RUF012"            # FIXME: Fixy fix 
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.12",
+]
+
+# [tool.ruff.lint.pyupgrade]
+# keep-runtime-typing = true
+

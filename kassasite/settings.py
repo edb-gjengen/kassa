@@ -153,6 +153,8 @@ LOGGING = {
 SENTRY_DSN = None
 SENTRY_ENVIRONMENT = 'dev'
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 # Local settings
 try:
     from .local_settings import *
