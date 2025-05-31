@@ -24,7 +24,7 @@ tests:
 lint:
   stage: test
   script:
-    - uv run bin/pre-commit
+    - bin/pre-commit
 
 deploy:
   stage: deploy
