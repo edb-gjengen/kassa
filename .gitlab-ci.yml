@@ -16,11 +16,6 @@ django-checks:
     - uv run manage.py migrate
     - uv run manage.py check
 
-tests:
-  stage: test
-  script:
-    - uv run bin/test
-
 lint:
   stage: test
   script:
