@@ -7,6 +7,8 @@ default:
     paths:
       - .cache/pip
       - .venv
+  before_script:
+    - apt-get update && apt-get install libsasl2-dev libldap2-dev -y
 
 django-checks:
   stage: build
@@ -40,4 +42,4 @@ deploy:
   script:
     - ssh gitdeploy@dreamcast.neuf.no "$(< bin/deploy)"
   only:
-    - main
+    - master
