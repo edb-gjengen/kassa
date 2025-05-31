@@ -1,0 +1,24 @@
+#!/bin/bash
+set -eu
+
+source "$HOME/.local/bin/env"
+
+export DJANGO_SETTINGS_MODULE=kassasite.settings
+PROJECT_PATH=/var/www/neuf.no/kassa
+PROCESS_NAME="kassa.neuf.no"
+
+echo "Deploying kassa to ${PROJECT_PATH}"
+cd "$PROJECT_PATH" || exit 1
+git pull
+
+# Frontend
+bin/build-frontend
+
+# Backend
+uv sync
+umask 022; uv run manage.py collectstatic --noinput -i node_modules -c  # Collect static (including frontend)
+uv run manage.py migrate  # Run DB migrations
+
+# Reload backend
+echo "Reloading supervisor processes ${PROCESS_NAME} ${PROCESS_NAME}-celery"
+sudo /usr/bin/supervisorctl pid "$PROCESS_NAME" | xargs kill -HUP
