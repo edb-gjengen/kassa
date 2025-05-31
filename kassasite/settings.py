@@ -9,16 +9,17 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
+import contextlib
+from pathlib import Path
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '79l0@&(^ra9=s783rqeo2awhs6@c!j&wan6t-0wi8azyd@!x+7'
+SECRET_KEY = "79l0@&(^ra9=s783rqeo2awhs6@c!j&wan6t-0wi8azyd@!x+7"  # noqa: S105
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -29,132 +30,117 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-
-    'bootstrapform',
-    'django_extensions',
-    'corsheaders',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "bootstrapform",
+    "django_extensions",
+    "corsheaders",
 )
 
-LOCAL_APPS = ('apps.kassa',)
+LOCAL_APPS = ("apps.kassa",)
 
 INSTALLED_APPS += LOCAL_APPS
 
 MIDDLEWARE = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
 )
 
-ROOT_URLCONF = 'kassasite.urls'
+ROOT_URLCONF = "kassasite.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'apps/kassa/templates')
-        ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'apps.kassa.context_processors.sentry',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR.joinpath("apps/kassa/templates")],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "apps.kassa.context_processors.sentry",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'kassasite.wsgi.application'
+WSGI_APPLICATION = "kassasite.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR.joinpath("db.sqlite3"),
     }
 }
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Europe/Oslo'
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "Europe/Oslo"
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-STATIC_URL = '/static/'
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = "/static/"
+STATICFILES_DIRS = (BASE_DIR.joinpath("static"),)
+STATIC_ROOT = BASE_DIR.joinpath("staticfiles")
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = "/"
 
-GALTINN_API_KEY = ''
-GALTINN_API_URL = 'https://galtinn.neuf.no/api/'
-GALTINN_ACTIVATION_URL = 'https://galtinn.neuf.no/activate/{to}/{code}'
+GALTINN_API_KEY = ""
+GALTINN_API_URL = "https://galtinn.neuf.no/api/"
+GALTINN_ACTIVATION_URL = "https://galtinn.neuf.no/activate/{to}/{code}"
 
-TEKSTMELDING_API_KEY = ''
-TEKSTMELDING_API_URL = 'https://tekstmelding.neuf.no/'
+TEKSTMELDING_API_KEY = ""
+TEKSTMELDING_API_URL = "https://tekstmelding.neuf.no/"
 TEKSTMELDING_ENABLED = True
-TEKSTMELDING_ACTIVATION_SMS_TEMPLATE = 'Velkommen som medlem! Registrer deg her: {url}'
+TEKSTMELDING_ACTIVATION_SMS_TEMPLATE = "Velkommen som medlem! Registrer deg her: {url}"
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s '
-                      '%(process)d %(thread)d %(message)s'
-        },
+    "version": 1,
+    "disable_existing_loggers": True,
+    "formatters": {
+        "verbose": {"format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"},
     },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
-        }
-    },
-    'loggers': {
-        'root': {
-            'level': 'WARNING',
-            'handlers': ['console'],
+    "handlers": {"console": {"level": "DEBUG", "class": "logging.StreamHandler", "formatter": "verbose"}},
+    "loggers": {
+        "root": {
+            "level": "WARNING",
+            "handlers": ["console"],
         },
-        'django.db.backends': {
-            'level': 'ERROR',
-            'handlers': ['console'],
-            'propagate': False,
+        "django.db.backends": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
         },
     },
 }
 
 SENTRY_DSN = None
-SENTRY_ENVIRONMENT = 'dev'
+SENTRY_ENVIRONMENT = "dev"
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Local settings
-try:
-    from .local_settings import *
-except ImportError:
-    pass
+with contextlib.suppress(ImportError):
+    from .local_settings import *  # noqa: F403
